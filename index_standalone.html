@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Input Demo (Real Audio)</title>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@100;200;300;400&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <style>
+        :root {
+            font-family: 'Fira Sans', system-ui, sans-serif;
+            /* background-color: #ffffff; removed in favor of image */
+            background-image: url('img/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            /* overflow: hidden; Removed to allow scroll */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            /* Prevent horizontal scroll only */
+        }
+
+        .voice-input-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            border-radius: 9999px;
+            /* Pills shape */
+            padding: 8px 8px 8px 8px;
+            /* Balanced padding */
+            /* box-shadow removed as per request */
+            box-shadow: none;
+            width: 632px;
+            /* 600px + 16px padding on each side */
+            max-width: 100%;
+            /* Responsive fallback */
+            height: 56px;
+            /* User requested 56px */
+            box-sizing: border-box;
+            border: 1px solid #e5e5e5;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* --- Shared Elements --- */
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            /* Back to 40px for generous touch target */
+            height: 40px;
+            border-radius: 50%;
+            transition: background-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            flex-shrink: 0;
+            /* Prevent shrinking */
+        }
+
+        .icon-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        /* --- Text Mode Specifics --- */
+        .text-input-field {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            /* Spec: 16 */
+            line-height: 20px;
+            /* Spec: 20 */
+            letter-spacing: 0px;
+            /* Spec: 0 */
+            color: #1a1a1a;
+            background: transparent;
+            font-family: 'Fira Sans', sans-serif;
+            font-weight: 300;
+            /* Spec: Light */
+            height: 100%;
+        }
+
+        .text-input-field::placeholder {
+            color: #9ca3af;
+            font-weight: 200;
+            /* ExtraLight for placeholder */
+            opacity: 1;
+            /* Firefox fix */
+        }
+
+        .send-btn {
+            background-color: #e5e5e5;
+            /* Disabled state: light gray */
+            color: #6b7280;
+            /* Disabled icon color */
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            cursor: default;
+            /* Non-clickable */
+        }
+
+        .send-btn.active {
+            background-color: #1a1a1a;
+            /* Active state: Black */
+            color: white;
+            /* Active icon color */
+            cursor: pointer;
+        }
+
+        .send-btn:hover {
+            background-color: #e5e5e5;
+            /* No hover effect when disabled */
+        }
+
+        .send-btn.active:hover {
+            background-color: #333;
+            /* Dark gray on hover when active */
+        }
+
+        /* --- Voice Mode Specifics --- */
+        .voice-mode-content {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            /* CRITICAL: needed for child percentage heights */
+            gap: 12px;
+        }
+
+        .voice-input-waveform {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /* Spread bars across full width */
+            gap: 2px;
+            /* Small, consistent gap */
+            height: 100%;
+            width: 100%;
+            /* Ensure it takes full available width */
+            padding: 0 16px;
+            /* Inner padding to container edges */
+            overflow: hidden;
+            overflow: hidden;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        .waveform-bar {
+            width: 1.5px;
+            /* Thinner bars for finer look */
+            background-color: #d1d5db;
+            border-radius: 999px;
+            height: 10%;
+            /* Slightly shorter idle state */
+            min-height: 10%;
+            transition: height 0.05s linear, background-color 0.1s ease;
+        }
+
+        .confirm-btn {
+            background-color: black;
+            color: white;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+        }
+
+        .confirm-btn:hover {
+            background-color: #333;
+        }
+
+        .voice-indicator-icon {
+            margin-right: 4px;
+            color: #333;
+        }
+
+        /* --- GLOW VARIANT CSS --- */
+        /* Angular gradient for glow mode - using user's color palette */
+        .voice-input-container.variant-glow {
+            border: 1px solid #e5e5e5;
+            /* Keep gray border when not talking */
+        }
+
+        /* Gray border stays visible always */
+
+        /* GLOW ONLY - no visible gradient border line */
+        .voice-input-container.variant-glow::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 35px;
+            /* USER'S EXACT COLOR PALETTE - rotated to 0deg for rectangle */
+            background: conic-gradient(from 0deg,
+                    #F29097 5%,
+                    #E5202E 15%,
+                    #F29097 30%,
+                    #C2DE90 40%,
+                    #85BC20 50%,
+                    #C2DE90 60%,
+                    #80BDE1 70%,
+                    #007AC3 85%,
+                    #80BDE1 95%,
+                    #F29097 100%);
+            z-index: -1;
+            opacity: 0;
+            filter: blur(12px);
+            transition: opacity 0.03s linear;
+        }
+
+        .voice-input-container.variant-glow.talking::after {
+            opacity: var(--glow-opacity, 0.8);
+        }
+
+        /* Inner white background to mask the gradient behind content */
+        .voice-input-container.variant-glow .glow-inner-bg {
+            position: absolute;
+            inset: 0;
+            background: white;
+            border-radius: 28px;
+            z-index: 0;
+        }
+
+        /* --- MOVING BORDER VARIANT --- Rotating animated border with pulse */
+        @keyframes rotate-pulse-border {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg) scaleX(0.5);
+            }
+
+            25% {
+                transform: translate(-50%, -50%) rotate(0.25turn) scaleX(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) rotate(0.5turn) scaleX(0.5);
+            }
+
+            75% {
+                transform: translate(-50%, -50%) rotate(0.75turn) scaleX(1);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(1turn) scaleX(0.5);
+            }
+        }
+
+        .voice-input-container.variant-moving-glow {
+            border: none;
+            overflow: hidden;
+            position: relative;
+            background: transparent;
+        }
+
+        /* The rotating gradient element */
+        .voice-input-container.variant-moving-glow::before {
+            content: '';
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            left: 50%;
+            transform-origin: center center;
+            width: 200%;
+            height: 2000%;
+            background-image: conic-gradient(rgba(0, 0, 0, 0) 0%,
+                    #E5202E 6%,
+                    #F29097 12%,
+                    #85BC20 18%,
+                    #85BC20 28%,
+                    #C2DE90 34%,
+                    #007AC3 40%,
+                    #80BDE1 46%,
+                    rgba(0, 0, 0, 0) 52%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes rotate-only {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            to {
+                transform: translate(-50%, -50%) rotate(1turn);
+            }
+        }
+
+        @keyframes pulse-width {
+
+            0%,
+            100% {
+                width: 150%;
+            }
+
+            50% {
+                width: 250%;
+            }
+        }
+
+        /* Disabled - using JS-based gradient div instead */
+        /*
+        .voice-input-container.variant-moving-glow.talking::before {
+            opacity: 1;
+            animation:
+                rotate-only 4s linear infinite,
+                pulse-width 2s ease-in-out infinite;
+        }
+        */
+
+        /* White background to cover the center - at higher z-index */
+        .voice-input-container.variant-moving-glow .moving-glow-inner-bg {
+            position: absolute;
+            inset: 2px;
+            background: white;
+            border-radius: 25px;
+            z-index: 2;
+            border: 1px solid #e5e5e5;
+        }
+
+        /* --- GLOW WAVE VARIANT --- */
+        .glow-wave-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 400%;
+            /* Massive height */
+            transform: translateY(-50%);
+            z-index: -1;
+            /* Behind input */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            padding: 0 10px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .voice-input-container.variant-glow.talking .glow-wave-container {
+            opacity: 1;
+        }
+
+        .glow-bar {
+            width: 30px;
+            /* Much wider to overlap and blend */
+            background-color: #3b82f6;
+            border-radius: 999px;
+            height: 10%;
+            filter: blur(25px);
+            /* Heavy blur */
+            opacity: 0.6;
+            transition: height 0.08s ease-out;
+            flex-shrink: 0;
+            margin-left: -12px;
+        }
+
+        /* Old blue border rule removed - now using transparent border for gradient */
+
+        .voice-glow-text {
+            flex: 1;
+            text-align: left;
+            padding-left: 16px;
+            font-family: 'Fira Sans', sans-serif;
+            font-size: 16px;
+            color: #3b82f6;
+            /* Blue text */
+            font-weight: 500;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // --- Icons ---
+        const MicIcon = ({ size = 28, strokeWidth = 1.5 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+                <line x1="8" y1="23" x2="16" y2="23" />
+            </svg>
+        );
+
+        const ArrowUpIcon = ({ size = 24, strokeWidth = 1.5 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+                <path d="m5 12 7-7 7 7" />
+                <path d="M12 19V5" />
+            </svg>
+        );
+
+        const PlusIcon = ({ size = 28, strokeWidth = 1 }) => ( /* Large, thin icon */
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="square" strokeLinejoin="miter">
+                <path d="M5 12h14M12 5v14" />
+            </svg>
+        );
+
+        const XIcon = ({ size = 24, strokeWidth = 1.5 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        );
+
+        const CheckIcon = ({ size = 24, strokeWidth = 1.5 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6 9 17l-5-5" />
+            </svg>
+        );
+
+        const VoiceInput = ({ onSend, variant = 'waveform' }) => {
+            const [mode, setMode] = useState('text'); // 'text' | 'voice'
+            const [transcript, setTranscript] = useState('');
+            const [visualizerData, setVisualizerData] = useState(new Uint8Array(40).fill(0));
+
+            const inputRef = useRef(null);
+            const audioContextRef = useRef(null);
+            const analyserRef = useRef(null);
+            const sourceRef = useRef(null);
+            const rafRef = useRef(null);
+            const streamRef = useRef(null);
+            const recognitionRef = useRef(null); // Speech recognition ref
+            const [interimTranscript, setInterimTranscript] = useState(''); // Live transcription
+
+            useEffect(() => {
+                if (mode === 'text' && inputRef.current) {
+                    inputRef.current.focus();
+                }
+            }, [mode]);
+
+            // Audio Logic
+            useEffect(() => {
+                if (mode === 'voice') {
+                    // Initialize visualizer with a static pattern immediately so it's not empty
+                    // Use 100 bars for high density
+                    setVisualizerData(new Uint8Array(100).fill(10));
+                    startAudio();
+                } else {
+                    stopAudio();
+                }
+                return () => stopAudio();
+            }, [mode]);
+
+            // Gradient arc animation for moving-glow variant
+            const [arcScale, setArcScale] = useState(1);
+            useEffect(() => {
+                if (mode === 'voice' && variant === 'moving-glow') {
+                    let start = null;
+                    let animationId;
+                    const animate = (timestamp) => {
+                        if (!start) start = timestamp;
+                        const elapsed = timestamp - start;
+                        // Subtle oscillation between 0.8 and 1.2 over 2 seconds (40-60% variation)
+                        const progress = (elapsed % 2000) / 2000;
+                        const scale = 1 + Math.sin(progress * Math.PI * 2) * 0.2;
+                        setArcScale(scale);
+                        animationId = requestAnimationFrame(animate);
+                    };
+                    animationId = requestAnimationFrame(animate);
+                    return () => cancelAnimationFrame(animationId);
+                }
+            }, [mode, variant]);
+
+            const startAudio = async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    streamRef.current = stream;
+
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    audioContextRef.current = audioCtx;
+                    await audioCtx.resume(); // Ensure context is running
+
+                    const analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 512; /* Larger FFT for more bins (256 bins now) */
+                    analyserRef.current = analyser;
+
+                    const source = audioCtx.createMediaStreamSource(stream);
+                    source.connect(analyser);
+                    sourceRef.current = source;
+
+                    // Small delay so user sees the initial idle bars before audio data starts updating
+                    setTimeout(() => {
+                        updateVisualizer();
+                    }, 100);
+
+                    // Start speech recognition
+                    startSpeechRecognition();
+                } catch (err) {
+                    console.error("Error accessing microphone:", err);
+                    alert("Could not access microphone. Please ensure you are running on localhost or via HTTPS.");
+                }
+            };
+
+            const stopAudio = () => {
+                if (rafRef.current) cancelAnimationFrame(rafRef.current);
+                if (sourceRef.current) {
+                    sourceRef.current.disconnect();
+                    sourceRef.current = null;
+                }
+                if (audioContextRef.current) {
+                    audioContextRef.current.close();
+                    audioContextRef.current = null;
+                }
+                if (streamRef.current) {
+                    streamRef.current.getTracks().forEach(track => track.stop());
+                    streamRef.current = null;
+                }
+                // Stop speech recognition
+                if (recognitionRef.current) {
+                    recognitionRef.current.stop();
+                    recognitionRef.current = null;
+                }
+                setVisualizerData(new Uint8Array(100).fill(0));
+            };
+
+            const updateVisualizer = () => {
+                if (!analyserRef.current) return;
+
+                const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+                analyserRef.current.getByteFrequencyData(dataArray);
+
+                const relevantData = dataArray.slice(0, 100); /* Display 100 bars */
+                setVisualizerData(new Uint8Array(relevantData));
+
+                rafRef.current = requestAnimationFrame(updateVisualizer);
+            };
+
+            // Speech Recognition
+            const startSpeechRecognition = () => {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    console.warn('Speech Recognition not supported in this browser.');
+                    return;
+                }
+
+                const recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                // Use ref to accumulate final results during this voice session
+                const accumulatedFinals = { current: '' };
+
+                recognition.onresult = (event) => {
+                    let interim = '';
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            // Accumulate final results in ref (not state, to avoid re-render issues)
+                            const finalText = event.results[i][0].transcript.trim();
+                            accumulatedFinals.current += (accumulatedFinals.current ? ' ' : '') + finalText;
+                        } else {
+                            interim += event.results[i][0].transcript;
+                        }
+                    }
+                    // Display accumulated finals + current interim
+                    setInterimTranscript(accumulatedFinals.current + (accumulatedFinals.current && interim ? ' ' : '') + interim);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                };
+
+                recognition.start();
+                recognitionRef.current = recognition;
+            };
+
+            const handleMicClick = () => {
+                setTranscript(''); // Clear previous input for fresh start
+                setInterimTranscript('');
+                setMode('voice');
+            };
+
+            const handleCancel = () => {
+                setMode('text');
+            };
+
+            const handleConfirm = () => {
+                // Only append any remaining interim text (in-progress speech)
+                // Final results are already in transcript from onresult handler
+                if (interimTranscript) {
+                    setTranscript(prev => prev + (prev ? ' ' : '') + interimTranscript.trim());
+                    setInterimTranscript('');
+                }
+                setMode('text');
+            };
+
+            const handleTextChange = (e) => {
+                // When user types, commit any pending interim transcript and clear it
+                // This prevents duplication when switching from voice to typing
+                if (interimTranscript) {
+                    setInterimTranscript('');
+                }
+                setTranscript(e.target.value);
+            };
+
+            // Calculate volume for glow effect
+            const getAverageVolume = () => {
+                if (!visualizerData || visualizerData.length === 0) return 0;
+                const sum = visualizerData.reduce((a, b) => a + b, 0);
+                return sum / visualizerData.length; // Average 0-255
+            };
+
+            const volume = getAverageVolume();
+
+            // Angular gradient glow - controlled via CSS variable
+            const glowIntensity = volume / 255;
+            // Opacity ranges from 0.05 (silent) to 0.95 (loud)
+            const glowOpacity = 0.05 + glowIntensity * 0.9;
+            const glowStyle = variant === 'glow' && mode === 'voice' ? {
+                '--glow-opacity': glowOpacity,
+            } : {};
+
+            return (
+                <div
+                    className={`voice-input-container ${mode === 'voice' ? 'talking' : ''} ${variant === 'glow' ? 'variant-glow' : ''} ${variant === 'moving-glow' ? 'variant-moving-glow' : ''}`}
+                    style={{ ...glowStyle, '--arc-scale': arcScale }}
+                >
+                    {/* Inner white background to mask gradient in glow mode */}
+                    {variant === 'glow' && <div className="glow-inner-bg" />}
+                    {/* Dynamic gradient for moving-glow variant */}
+                    {variant === 'moving-glow' && mode === 'voice' && (
+                        <div
+                            className="moving-glow-gradient"
+                            style={{
+                                position: 'absolute',
+                                zIndex: 1,
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: '200%',
+                                height: '2000%',
+                                backgroundImage: `conic-gradient(
+                                    rgba(0, 0, 0, 0) 0%,
+                                    #E5202E ${6 * arcScale}%,
+                                    #F29097 ${12 * arcScale}%,
+                                    #85BC20 ${18 * arcScale}%,
+                                    #85BC20 ${28 * arcScale}%,
+                                    #C2DE90 ${34 * arcScale}%,
+                                    #007AC3 ${40 * arcScale}%,
+                                    #80BDE1 ${46 * arcScale}%,
+                                    rgba(0, 0, 0, 0) ${52 * arcScale}%
+                                )`,
+                                animation: 'rotate-only 4s linear infinite'
+                            }}
+                        />
+                    )}
+                    {/* Inner white background for moving-glow variant */}
+                    {variant === 'moving-glow' && <div className="moving-glow-inner-bg" />}
+
+                    {/* Main Content */}
+                    <div style={{ position: 'relative', zIndex: 3, display: 'flex', alignItems: 'center', width: '100%', height: '100%', gap: '12px' }}>
+
+                        {mode === 'text' || (mode === 'voice' && (variant === 'glow' || variant === 'moving-glow')) ? (
+                            <>
+                                {/* Plus Icon with hover effect */}
+                                <div className="icon-btn" aria-hidden="true" style={{ width: '40px', height: '40px', marginRight: '8px' }}>
+                                    <PlusIcon size={28} strokeWidth={1} />
+                                </div>
+
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    className="text-input-field"
+                                    placeholder={mode === 'voice' && (variant === 'glow' || variant === 'moving-glow') ? "Listening..." : "How can Expert AI help?"}
+                                    value={mode === 'voice' && interimTranscript ? (transcript + (transcript ? ' ' : '') + interimTranscript) : transcript}
+                                    onChange={handleTextChange}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && onSend) {
+                                            const finalTranscript = mode === 'voice' && interimTranscript ? (transcript + (transcript ? ' ' : '') + interimTranscript) : transcript;
+                                            if (finalTranscript) {
+                                                onSend(finalTranscript);
+                                                setTranscript('');
+                                                setInterimTranscript('');
+                                                setMode('text');
+                                            }
+                                        }
+                                    }}
+                                />
+
+                                <button
+                                    className="icon-btn"
+                                    onClick={mode === 'voice' ? handleConfirm : handleMicClick}
+                                    aria-label={mode === 'voice' ? "Stop Listening" : "Use Microphone"}
+                                    style={{ color: mode === 'voice' && (variant === 'glow' || variant === 'moving-glow') ? '#007AFF' : 'inherit' }}
+                                >
+                                    <MicIcon size={24} />
+                                </button>
+
+                                <button
+                                    className={`icon-btn send-btn ${transcript || interimTranscript ? 'active' : ''}`}
+                                    onClick={() => {
+                                        const finalTranscript = mode === 'voice' && interimTranscript ? (transcript + (transcript ? ' ' : '') + interimTranscript) : transcript;
+                                        if (onSend && finalTranscript) {
+                                            onSend(finalTranscript);
+                                            setTranscript(''); // Clear after send
+                                            setInterimTranscript('');
+                                            setMode('text');
+                                        }
+                                    }}
+                                    disabled={!transcript && !interimTranscript}
+                                    aria-label="Send"
+                                >
+                                    <ArrowUpIcon size={20} />
+                                </button>
+                            </>
+                        ) : (
+                            /* Voice Mode (Waveform Variant) */
+                            <div className="voice-mode-content">
+                                {/* Plus Icon with hover effect */}
+                                <div className="icon-btn" aria-hidden="true" style={{ cursor: 'default' }}>
+                                    <PlusIcon size={24} strokeWidth={1.5} />
+                                </div>
+
+                                <div className="voice-input-waveform">
+                                    {Array.from(visualizerData).map((value, i) => {
+                                        // Map 0-255 to remaining 90%
+                                        const heightPercent = 10 + (value / 255) * 90;
+                                        const isSilent = value <= 10;
+
+                                        return (
+                                            <div
+                                                key={i}
+                                                className="waveform-bar"
+                                                style={{
+                                                    height: `${heightPercent}%`,
+                                                    // Design has light gray silent bars, black active bars
+                                                    backgroundColor: isSilent ? '#d1d5db' : '#000000',
+                                                }}
+                                            />
+                                        );
+                                    })}
+                                </div>
+
+                                <button className="icon-btn" onClick={handleCancel} aria-label="Cancel" style={{ marginLeft: '8px' }}>
+                                    <XIcon size={24} strokeWidth={1.5} />
+                                </button>
+                                <button className="icon-btn confirm-btn" onClick={handleConfirm} aria-label="Confirm">
+                                    <CheckIcon size={20} strokeWidth={2} />
+                                </button>
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [chatStarted, setChatStarted] = useState(false);
+            const [messages, setMessages] = useState([]);
+            const [voiceVariant, setVoiceVariant] = useState('waveform'); // 'waveform' | 'glow'
+
+            const generalResponses = [
+                "That's interesting! Tell me more.",
+                "I understand. How else can I assist you?",
+                "Could you elaborate on that?",
+                "I'm here to listen and help.",
+                "That's a great point.",
+                "I see. Please go on.",
+                "Interesting perspective.",
+                "Is there anything specific you'd like to discuss?",
+                "I'm ready to help with whatever is on your mind.",
+                "Okay, I'm listening."
+            ];
+
+            const getSimulatedResponse = () => {
+                const randomIndex = Math.floor(Math.random() * generalResponses.length);
+                return generalResponses[randomIndex];
+            };
+
+            const handleSend = (text) => {
+                // 1. Add User Message
+                const newUserMsg = { text, sender: 'user' };
+                setMessages(prev => [...prev, newUserMsg]);
+                setChatStarted(true);
+
+                // 2. Simulate AI Response after delay
+                setTimeout(() => {
+                    const aiMsg = {
+                        text: getSimulatedResponse(),
+                        sender: 'ai'
+                    };
+                    setMessages(prev => [...prev, aiMsg]);
+                }, 1000);
+            };
+
+            useEffect(() => {
+                if (chatStarted) {
+                    // Force white background and reset positioning context on root
+                    document.documentElement.style.backgroundImage = 'none';
+                    document.documentElement.style.backgroundColor = '#ffffff';
+                    document.documentElement.style.alignItems = 'flex-start'; // Align top
+                }
+            }, [chatStarted]);
+
+            return (
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: '100vh', /* Fix: Use minHeight so it grows with content */
+                    width: '100%',
+                    justifyContent: chatStarted ? 'space-between' : 'center',
+                    alignItems: 'center',
+                    padding: chatStarted ? '40px 0 40px 0' : '0',
+                    boxSizing: 'border-box'
+                }}>
+                    {/* Top Right Controls Container */}
+                    <div style={{
+                        position: 'fixed',
+                        top: '24px',
+                        right: '24px',
+                        zIndex: 200,
+                        display: 'flex',
+                        gap: '12px',
+                        alignItems: 'center'
+                    }}>
+                        {/* New Chat Button */}
+                        <div style={{
+                            backgroundColor: 'white',
+                            padding: '4px',
+                            borderRadius: '50%',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                        }}>
+                            <button
+                                onClick={() => window.location.reload()}
+                                title="New Chat"
+                                style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '50%',
+                                    border: 'none',
+                                    backgroundColor: 'transparent',
+                                    color: '#666',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f0f0f0'}
+                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 20h9" />
+                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                            </button>
+                        </div>
+                        {/* Toggle Buttons */}
+                        <div style={{
+                            backgroundColor: 'white',
+                            padding: '4px',
+                            borderRadius: '999px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                            display: 'flex',
+                            gap: '4px'
+                        }}>
+                            <button
+                                onClick={() => setVoiceVariant('waveform')}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '999px',
+                                    border: 'none',
+                                    backgroundColor: voiceVariant === 'waveform' ? '#1a1a1a' : 'transparent',
+                                    color: voiceVariant === 'waveform' ? 'white' : '#666',
+                                    cursor: 'pointer',
+                                    fontFamily: 'Fira Sans',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Waveform
+                            </button>
+                            <button
+                                onClick={() => setVoiceVariant('glow')}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '999px',
+                                    border: 'none',
+                                    backgroundColor: voiceVariant === 'glow' ? '#1a1a1a' : 'transparent',
+                                    color: voiceVariant === 'glow' ? 'white' : '#666',
+                                    cursor: 'pointer',
+                                    fontFamily: 'Fira Sans',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Glow
+                            </button>
+                            <button
+                                onClick={() => setVoiceVariant('moving-glow')}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '999px',
+                                    border: 'none',
+                                    backgroundColor: voiceVariant === 'moving-glow' ? '#1a1a1a' : 'transparent',
+                                    color: voiceVariant === 'moving-glow' ? 'white' : '#666',
+                                    cursor: 'pointer',
+                                    fontFamily: 'Fira Sans',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Moving Border
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Chat Area - Messages scroll with the page */}
+                    {
+                        chatStarted && (
+                            <div style={{
+                                width: '100%',
+                                maxWidth: '600px', /* Kept at 600px as requested */
+                                margin: '0 auto',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '16px',
+                                padding: '40px 0 120px 0', /* Reduced top padding, kept bottom for input */
+                                boxSizing: 'border-box'
+                            }}>
+                                {messages.map((msg, idx) => (
+                                    <div key={idx} style={{
+                                        padding: '12px 20px', /* Restored padding */
+                                        borderRadius: '24px',
+                                        borderBottomRightRadius: msg.sender === 'user' ? '4px' : '24px',
+                                        borderBottomLeftRadius: msg.sender === 'ai' ? '4px' : '24px',
+                                        fontFamily: 'Fira Sans',
+                                        fontSize: '16px',
+                                        lineHeight: '1.5',
+                                        color: '#1a1a1a',
+                                        maxWidth: '80%',
+                                        wordBreak: 'break-word',
+                                        animation: 'msgFloatUp 0.3s ease-out',
+                                        alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                                        backgroundColor: msg.sender === 'user' ? '#f3f4f6' : '#ffffff',
+                                        border: msg.sender === 'ai' ? '1px solid #e5e5e5' : 'none'
+                                    }}>
+                                        {msg.text}
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                    }
+
+                    {/* Input Area - Centered initially, Fixed at bottom when chat follows */}
+                    {/* Input Area - Centered initially, Fixed at bottom when chat follows */}
+                    <div style={{
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: chatStarted ? 'fixed' : 'absolute',
+                        top: chatStarted ? 'auto' : 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 100,
+                        height: chatStarted ? 'auto' : '100%', /* Full screen on splash */
+                        backgroundColor: chatStarted ? '#ffffff' : 'transparent',
+                        paddingBottom: chatStarted ? '16px' : '0',
+                        paddingTop: 0,
+                        pointerEvents: 'auto' /* Always auto to catch clicks on input. Background clicks in splash are fine. */
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            width: '100%',
+                            marginTop: 'auto',
+                            marginBottom: 'auto'
+                        }}>
+                            {!chatStarted && (
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <img
+                                        src="img/expert-ai-spark.svg"
+                                        alt=""
+                                        style={{
+                                            marginBottom: '24px',
+                                            width: '60px',
+                                            height: '60px'
+                                        }}
+                                    />
+                                    <h1 style={{
+                                        fontFamily: 'Fira Sans, sans-serif',
+                                        fontWeight: 500,
+                                        fontSize: '28px',
+                                        lineHeight: '36px',
+                                        letterSpacing: '0px',
+                                        color: '#000000',
+                                        marginBottom: '40px',
+                                        textAlign: 'center',
+                                        margin: '0 0 40px 0'
+                                    }}>
+                                        How can I help you?
+                                    </h1>
+                                </div>
+                            )}
+                            <VoiceInput onSend={handleSend} variant={voiceVariant} />
+                        </div>
+                    </div>
+
+                    <style>{`
+                        @keyframes msgFloatUp {
+                            from { opacity: 0; transform: translateY(20px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+                    `}</style>
+                </div >
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
