@@ -71,9 +71,9 @@ export default function App() {
             document.body.style.backgroundImage = 'none';
             document.body.style.backgroundColor = '#ffffff';
         } else {
-            document.documentElement.style.backgroundImage = "url('../img/background.jpg')";
+            document.documentElement.style.backgroundImage = "url('./img/background.jpg')";
             document.documentElement.style.backgroundColor = '';
-            document.body.style.backgroundImage = "url('../img/background.jpg')";
+            document.body.style.backgroundImage = "url('./img/background.jpg')";
             document.body.style.backgroundColor = '';
         }
     }, [chatStarted]);
@@ -148,7 +148,7 @@ export default function App() {
                     {!chatStarted && (
                         <div className="flex flex-col items-center mb-10">
                             <img
-                                src="../img/expert-ai-spark.svg"
+                                src="./img/expert-ai-spark.svg"
                                 alt=""
                                 className="w-16 h-16 mb-6"
                             />
