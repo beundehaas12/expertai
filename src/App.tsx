@@ -89,7 +89,7 @@ export default function App() {
             <div className="fixed top-6 right-6 z-50 flex items-center gap-2">
                 {/* Variant Toggle */}
                 <div className="glass rounded-full p-1 shadow-md flex gap-1">
-                    {(['waveform', 'glow', 'moving-glow'] as const).map((v) => (
+                    {(['waveform', 'glow', 'moving-glow', 'intelligence'] as const).map((v) => (
                         <button
                             key={v}
                             onClick={() => setVoiceVariant(v)}

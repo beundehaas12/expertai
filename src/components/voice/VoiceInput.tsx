@@ -4,6 +4,7 @@ import { Mic, ArrowUp, Plus, X, Check } from 'lucide-react';
 import { Waveform } from './Waveform';
 import { GlowEffect } from './GlowEffect';
 import { MovingGlowEffect } from './MovingGlowEffect';
+import { IntelligenceEffect } from './IntelligenceEffect';
 import type { VoiceVariant, VoiceInputMode } from '@/types';
 
 interface VoiceInputProps {
@@ -209,8 +210,9 @@ export function VoiceInput({ onSend, variant = 'waveform' }: VoiceInputProps) {
     const glowIntensity = volume / 255;
     const isGlowVariant = variant === 'glow';
     const isMovingGlowVariant = variant === 'moving-glow';
+    const isIntelligenceVariant = variant === 'intelligence';
     const isVoiceMode = mode === 'voice';
-    const showInputMode = mode === 'text' || (isVoiceMode && (isGlowVariant || isMovingGlowVariant));
+    const showInputMode = mode === 'text' || (isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant));
 
     return (
         <div
@@ -230,6 +232,11 @@ export function VoiceInput({ onSend, variant = 'waveform' }: VoiceInputProps) {
             {/* Moving Glow Effect for moving-glow variant */}
             {isMovingGlowVariant && (
                 <MovingGlowEffect isActive={isVoiceMode} />
+            )}
+
+            {/* Intelligence Effect for intelligence variant - full page glow */}
+            {isIntelligenceVariant && (
+                <IntelligenceEffect isActive={isVoiceMode} intensity={glowIntensity} />
             )}
 
             {/* Main Content */}
@@ -256,7 +263,7 @@ export function VoiceInput({ onSend, variant = 'waveform' }: VoiceInputProps) {
                                 ref={inputRef}
                                 type="text"
                                 className="flex-1 h-full bg-transparent border-none outline-none text-base text-gray-900 font-light placeholder:text-gray-400 placeholder:font-extralight"
-                                placeholder={isVoiceMode && (isGlowVariant || isMovingGlowVariant) ? "Listening..." : "How can Expert AI help?"}
+                                placeholder={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? "Listening..." : "How can Expert AI help?"}
                                 value={displayValue}
                                 onChange={handleTextChange}
                                 onKeyDown={handleKeyDown}
@@ -269,7 +276,7 @@ export function VoiceInput({ onSend, variant = 'waveform' }: VoiceInputProps) {
                                 className={`
                   flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full
                   transition-colors duration-200
-                  ${isVoiceMode && (isGlowVariant || isMovingGlowVariant) ? 'text-blue-500' : 'text-gray-700 hover:bg-gray-100'}
+                  ${isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? 'text-blue-500' : 'text-gray-700 hover:bg-gray-100'}
                 `}
                                 onClick={isVoiceMode ? handleConfirm : handleMicClick}
                                 aria-label={isVoiceMode ? "Stop Listening" : "Use Microphone"}

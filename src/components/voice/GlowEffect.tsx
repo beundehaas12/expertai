@@ -6,14 +6,14 @@ interface GlowEffectProps {
 }
 
 export const GlowEffect = memo(function GlowEffect({ intensity, isActive }: GlowEffectProps) {
-    // Opacity ranges from 0.3 (silent) to 1.0 (loud) for better visibility
-    const glowOpacity = isActive ? 0.3 + intensity * 0.7 : 0;
+    // More subtle at rest (0.1), reaches full 1.0 when talking loudly
+    const glowOpacity = isActive ? 0.1 + intensity * 0.9 : 0;
 
     return (
         <>
             {/* Glow pseudo-element */}
             <div
-                className="absolute -inset-3 rounded-[35px] -z-10 transition-opacity duration-75"
+                className="absolute -inset-2 rounded-[35px] -z-10"
                 style={{
                     background: `conic-gradient(from 0deg,
             #F29097 5%,
@@ -27,8 +27,9 @@ export const GlowEffect = memo(function GlowEffect({ intensity, isActive }: Glow
             #80BDE1 95%,
             #F29097 100%
           )`,
-                    filter: 'blur(16px)',
+                    filter: 'blur(12px)',
                     opacity: glowOpacity,
+                    transition: 'opacity 0.1s ease-out',
                 }}
             />
             {/* Inner white background to mask gradient behind content */}

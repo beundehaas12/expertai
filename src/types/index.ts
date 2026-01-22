@@ -1,5 +1,5 @@
 // Voice input variants
-export type VoiceVariant = 'waveform' | 'glow' | 'moving-glow';
+export type VoiceVariant = 'waveform' | 'glow' | 'moving-glow' | 'intelligence';
 
 // Chat message types
 export type MessageSender = 'user' | 'ai';
