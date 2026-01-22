@@ -11,9 +11,11 @@ interface VoiceInputProps {
     onSend: (text: string) => void;
     variant?: VoiceVariant;
     dropdownAbove?: boolean;
+    splitView?: boolean;
+    onVoiceStateChange?: (isVoiceMode: boolean, intensity: number) => void;
 }
 
-export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false }: VoiceInputProps) {
+export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false, splitView = false, onVoiceStateChange }: VoiceInputProps) {
     const [mode, setMode] = useState<VoiceInputMode>('text');
     const [textValue, setTextValue] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
@@ -53,6 +55,15 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showDropdown]);
+
+    // Report voice state changes to parent
+    useEffect(() => {
+        if (onVoiceStateChange) {
+            const isVoiceMode = mode === 'voice';
+            const intensity = volume / 255;
+            onVoiceStateChange(isVoiceMode, intensity);
+        }
+    }, [mode, volume, onVoiceStateChange]);
 
     // Audio and speech recognition - direct implementation like original
     useEffect(() => {
@@ -239,7 +250,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
             className={`
         relative flex items-center gap-3 
         rounded-full p-2 
-        w-[632px] max-w-full h-14
+        w-full max-w-[632px] h-14
         ${isMovingGlowVariant ? 'bg-transparent overflow-hidden' : 'bg-white border border-gray-200'}
         ${isVoiceMode && isGlowVariant ? 'shadow-lg' : ''}
       `}
@@ -254,9 +265,9 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                 <MovingGlowEffect isActive={isVoiceMode} />
             )}
 
-            {/* Intelligence Effect for intelligence variant - full page glow */}
-            {isIntelligenceVariant && (
-                <IntelligenceEffect isActive={isVoiceMode} intensity={glowIntensity} />
+            {/* Intelligence Effect for intelligence variant - only when NOT in split view (App handles split view) */}
+            {isIntelligenceVariant && !splitView && (
+                <IntelligenceEffect isActive={isVoiceMode} intensity={glowIntensity} contained={false} />
             )}
 
             {/* Main Content */}
@@ -311,7 +322,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                             <input
                                 ref={inputRef}
                                 type="text"
-                                className="flex-1 h-full bg-transparent border-none outline-none text-base text-gray-900 font-light placeholder:text-gray-400 placeholder:font-extralight"
+                                className="flex-1 min-w-0 h-full bg-transparent border-none outline-none text-base text-gray-900 font-light placeholder:text-gray-400 placeholder:font-extralight text-ellipsis"
                                 placeholder={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? "Listening..." : "How can Expert AI help?"}
                                 value={displayValue}
                                 onChange={handleTextChange}
