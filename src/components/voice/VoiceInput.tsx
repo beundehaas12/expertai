@@ -252,6 +252,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
         rounded-full p-2 
         w-full max-w-[632px] h-14
         ${isMovingGlowVariant ? 'bg-transparent overflow-hidden' : 'bg-white border border-gray-200'}
+        ${isGlowVariant ? 'overflow-visible' : ''}
         ${isVoiceMode && isGlowVariant ? 'shadow-lg' : ''}
       `}
         >

@@ -191,7 +191,7 @@ export default function App() {
 
                     {/* Right Panel - Chat */}
                     <div
-                        className="flex flex-col relative overflow-hidden"
+                        className="flex flex-col relative"
                         style={{
                             width: `${splitWidth}%`,
                             backgroundImage: chatStarted ? 'none' : "url('./img/background.jpg')",
@@ -218,7 +218,7 @@ export default function App() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex-1 flex flex-col items-center justify-center px-4">
+                            <div className="flex-1 flex flex-col items-center justify-center px-4 overflow-visible">
                                 <img
                                     src="./img/expert-ai-spark.svg"
                                     alt=""
@@ -233,7 +233,7 @@ export default function App() {
 
                         {/* Input Area - fixed at bottom, not absolute */}
                         {chatStarted && (
-                            <div className="flex-shrink-0 bg-white h-[72px] flex items-start justify-center px-4">
+                            <div className="flex-shrink-0 bg-white h-[72px] flex items-start justify-center px-4 overflow-visible">
                                 <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} splitView={true} onVoiceStateChange={handleVoiceStateChange} />
                             </div>
                         )}
