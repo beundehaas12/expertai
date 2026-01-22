@@ -137,7 +137,7 @@ export default function App() {
             <div
                 className={`
           ${chatStarted
-                        ? 'fixed bottom-0 left-0 right-0 bg-white py-4'
+                        ? 'fixed bottom-0 left-0 right-0 bg-white h-[72px] flex items-start justify-center pt-0'
                         : 'absolute inset-0 flex flex-col items-center justify-center'
                     }
           z-40
