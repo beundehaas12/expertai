@@ -1,10 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@100;200;300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
 
-:root {
-  font-family: 'Fira Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
+/* Design Tokens */
+@theme {
+  /* Colors */
+  --color-primary: #1a1a1a;
+  --color-primary-hover: #333333;
+  --color-secondary: #6b7280;
+  --color-border: #e5e5e5;
+  --color-accent: #007AFF;
+  --color-accent-light: #3b82f6;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f3f4f6;
+  --color-text: #1a1a1a;
+  --color-text-muted: #9ca3af;
+
+  /* Glow gradient colors */
+  --color-glow-pink: #F29097;
+  --color-glow-red: #E5202E;
+  --color-glow-lime: #C2DE90;
+  --color-glow-green: #85BC20;
+  --color-glow-sky: #80BDE1;
+  --color-glow-blue: #007AC3;
+
+  /* Dark mode colors */
+  --color-dark-bg: #0a0a0a;
+  --color-dark-surface: #1a1a1a;
+  --color-dark-border: #2a2a2a;
+  --color-dark-text: #f5f5f5;
+  --color-dark-text-muted: #888888;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 40px;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 30px rgba(0, 122, 195, 0.3);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -19,11 +84,19 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  /* background-color: #ffffff; removed in favor of image */
   background-image: url('../img/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  color: var(--color-text);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body.dark-mode {
+    background-color: var(--color-dark-bg);
+    color: var(--color-dark-text);
+  }
 }
 
 #root {
@@ -31,6 +104,126 @@ body {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0;
-  /* Removing padding to fix scroll issue */
   text-align: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes wave {
+
+  0%,
+  100% {
+    height: 20%;
+  }
+
+  50% {
+    height: 60%;
+  }
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes gradientRotate {
+  0% {
+    --gradient-angle: 0deg;
+  }
+
+  100% {
+    --gradient-angle: 360deg;
+  }
+}
+
+/* Utility classes for animations */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.animate-bounce {
+  animation: bounce 0.6s ease-in-out infinite;
+}
+
+/* Glassmorphism utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-dark {
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-glow-blue), var(--color-glow-green), var(--color-glow-pink));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
