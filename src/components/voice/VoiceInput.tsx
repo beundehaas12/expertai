@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, ArrowUp, Plus, X, Check } from 'lucide-react';
+import { Mic, ArrowUp, Plus, X, Check, Image, FileText } from 'lucide-react';
 import { Waveform } from './Waveform';
 import { GlowEffect } from './GlowEffect';
 import { MovingGlowEffect } from './MovingGlowEffect';
@@ -10,16 +10,19 @@ import type { VoiceVariant, VoiceInputMode } from '@/types';
 interface VoiceInputProps {
     onSend: (text: string) => void;
     variant?: VoiceVariant;
+    dropdownAbove?: boolean;
 }
 
-export function VoiceInput({ onSend, variant = 'waveform' }: VoiceInputProps) {
+export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false }: VoiceInputProps) {
     const [mode, setMode] = useState<VoiceInputMode>('text');
     const [textValue, setTextValue] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
     const [visualizerData, setVisualizerData] = useState<Uint8Array>(new Uint8Array(100).fill(0));
     const [volume, setVolume] = useState(0);
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
     const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
@@ -33,6 +36,23 @@ export function VoiceInput({ onSend, variant = 'waveform' }: VoiceInputProps) {
             inputRef.current.focus();
         }
     }, [mode]);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        };
+
+        if (showDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showDropdown]);
 
     // Audio and speech recognition - direct implementation like original
     useEffect(() => {
@@ -250,13 +270,42 @@ export function VoiceInput({ onSend, variant = 'waveform' }: VoiceInputProps) {
                             exit={{ opacity: 0 }}
                             className="flex items-center w-full h-full gap-3"
                         >
-                            {/* Plus Button */}
-                            <button
-                                className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500"
-                                aria-hidden="true"
-                            >
-                                <Plus size={28} strokeWidth={1} />
-                            </button>
+                            {/* Plus Button with Dropdown */}
+                            <div className="relative">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+                                    aria-label="Add attachment"
+                                    onClick={() => setShowDropdown(!showDropdown)}
+                                >
+                                    <Plus size={28} strokeWidth={1} />
+                                </motion.button>
+
+                                {/* Dropdown Menu */}
+                                {showDropdown && (
+                                    <div
+                                        ref={dropdownRef}
+                                        className={`absolute left-0 bg-white rounded-lg shadow-lg border border-[#DADADA] overflow-hidden min-w-[180px] z-50 ${dropdownAbove ? 'bottom-full mb-2' : 'top-full mt-2'}`}
+                                        style={{ borderRadius: '8px' }}
+                                    >
+                                        <button
+                                            className="w-full px-4 py-3 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                            onClick={() => setShowDropdown(false)}
+                                        >
+                                            <Image size={18} className="text-gray-500" />
+                                            <span className="text-sm">Upload Image</span>
+                                        </button>
+                                        <button
+                                            className="w-full px-4 py-3 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                            onClick={() => setShowDropdown(false)}
+                                        >
+                                            <FileText size={18} className="text-gray-500" />
+                                            <span className="text-sm">Upload Document</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* Text Input */}
                             <input

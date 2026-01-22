@@ -158,7 +158,7 @@ export default function App() {
                         </div>
                     )}
 
-                    <VoiceInput onSend={handleSend} variant={voiceVariant} />
+                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={chatStarted} />
                 </div>
             </div>
         </div>
