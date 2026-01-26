@@ -645,8 +645,17 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             </div>
                         )}
 
-                        {/* Vertical Action Bar - positioned to align with header settings icon */}
-                        <div className="absolute top-4 right-[22px] z-10">
+                        {/* Vertical Action Bar - fixed position so it stays visible when scrolling */}
+                        <div
+                            className="fixed top-[76px] z-10"
+                            style={{
+                                // When chat is open: stick to left of chat panel
+                                // When chat is closed: stick to right edge of centered 1200px content
+                                right: chatPanelOpen
+                                    ? `calc(${splitWidth}% + 22px)`
+                                    : 'max(22px, calc((100vw - 1200px) / 2 + 22px))'
+                            }}
+                        >
                             <ActionBar
                                 onNewChat={handleNewChat}
                                 onStartChat={() => setChatPanelOpen(true)}
