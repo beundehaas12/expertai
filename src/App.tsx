@@ -175,6 +175,7 @@ export default function App() {
                 onVoiceVariantChange={setVoiceVariant}
                 buttonPosition={buttonPosition}
                 onButtonPositionChange={setButtonPosition}
+                isSplitView={splitView}
             />
 
             {/* Main Layout */}

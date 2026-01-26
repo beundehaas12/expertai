@@ -13,6 +13,7 @@ interface SideModalProps {
     onVoiceVariantChange?: (variant: VoiceVariant) => void;
     buttonPosition?: ButtonPosition;
     onButtonPositionChange?: (position: ButtonPosition) => void;
+    isSplitView?: boolean;
 }
 
 const voiceVariants: { value: VoiceVariant; label: string }[] = [
@@ -38,6 +39,7 @@ export function SideModal({
     onVoiceVariantChange,
     buttonPosition = 'header',
     onButtonPositionChange,
+    isSplitView = false,
 }: SideModalProps) {
     return (
         <AnimatePresence>
@@ -89,15 +91,29 @@ export function SideModal({
                         <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
                             {children || (
                                 <>
-                                    <div style={{ marginBottom: '24px' }}>
-                                        <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '12px', marginTop: 0, textAlign: 'left' }}>
+                                    <div style={{ marginBottom: '24px', opacity: isSplitView ? 1 : 0.5 }}>
+                                        <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px', marginTop: 0, textAlign: 'left' }}>
                                             Expert AI Call to Action Position
                                         </h3>
+                                        {!isSplitView && (
+                                            <div style={{
+                                                fontSize: '12px',
+                                                color: '#6b7280',
+                                                marginBottom: '12px',
+                                                padding: '8px 12px',
+                                                backgroundColor: '#f3f4f6',
+                                                borderRadius: '6px',
+                                                textAlign: 'left',
+                                            }}>
+                                                This setting only works in Split view
+                                            </div>
+                                        )}
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             {buttonPositions.map(({ value, label }) => (
                                                 <button
                                                     key={value}
-                                                    onClick={() => onButtonPositionChange?.(value)}
+                                                    onClick={() => isSplitView && onButtonPositionChange?.(value)}
+                                                    disabled={!isSplitView}
                                                     style={{
                                                         display: 'flex',
                                                         alignItems: 'center',
@@ -106,7 +122,7 @@ export function SideModal({
                                                         borderRadius: '8px',
                                                         border: buttonPosition === value ? '2px solid #111827' : '1px solid #DADADA',
                                                         backgroundColor: buttonPosition === value ? '#F9FAFB' : '#ffffff',
-                                                        cursor: 'pointer',
+                                                        cursor: isSplitView ? 'pointer' : 'not-allowed',
                                                         textAlign: 'left',
                                                         transition: 'all 0.15s ease',
                                                     }}
