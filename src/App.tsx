@@ -108,6 +108,16 @@ export default function App() {
     // Ref for content area (for selection tooltip)
     const contentRef = useRef<HTMLDivElement>(null);
 
+    // Ref for chat scroll container
+    const chatScrollRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll to bottom when messages change or typing starts
+    useEffect(() => {
+        if (chatScrollRef.current) {
+            chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+        }
+    }, [messages, isTyping]);
+
     // Handle "Chat about this" from text selection
     const handleChatAboutSelection = useCallback((selectedText: string) => {
         // Open chat panel if not already open
@@ -428,7 +438,7 @@ export default function App() {
 
                             {/* Chat Messages or Welcome */}
                             {chatStarted ? (
-                                <div className="flex-1 overflow-y-auto px-8 pt-12 pb-4">
+                                <div ref={chatScrollRef} className="flex-1 overflow-y-auto px-8 pt-12 pb-4">
                                     <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                         {messages.map((msg) => (
                                             <ChatMessage key={msg.id} message={msg} />
@@ -466,7 +476,7 @@ export default function App() {
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {/* Chat Messages - scrollable area */}
                     {chatStarted ? (
-                        <div className="flex-1 overflow-y-auto px-8 pt-6 pb-4">
+                        <div ref={chatScrollRef} className="flex-1 overflow-y-auto px-8 pt-6 pb-4">
                             <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                 {messages.map((msg) => (
                                     <ChatMessage key={msg.id} message={msg} />
