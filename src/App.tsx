@@ -138,7 +138,7 @@ export default function App() {
     // Derived state for existing components using boolean flags
     const isTyping = aiStatus === 'thinking';
 
-    const [voiceVariant, setVoiceVariant] = useState<VoiceVariant>('waveform');
+    const [voiceVariant, setVoiceVariant] = useState<VoiceVariant>('glow');
     const [splitView, setSplitView] = useState(() => {
         const saved = localStorage.getItem('expertai-view');
         return saved === 'split';
