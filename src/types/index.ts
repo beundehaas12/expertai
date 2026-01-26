@@ -1,6 +1,9 @@
 // Voice input variants
 export type VoiceVariant = 'waveform' | 'glow' | 'moving-glow' | 'intelligence';
 
+// Action button position options
+export type ButtonPosition = 'none' | 'header' | 'actionbar' | 'floating';
+
 // Chat message types
 export type MessageSender = 'user' | 'ai';
 

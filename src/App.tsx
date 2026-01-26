@@ -4,7 +4,7 @@ import { X, Settings } from 'lucide-react';
 import { VoiceInput } from '@/components/voice';
 import { ChatMessage, TypingIndicator } from '@/components/chat';
 import { ActionBar, ExpertButton, SideModal } from '@/components/ui';
-import type { ChatMessage as ChatMessageType, VoiceVariant } from '@/types';
+import type { ChatMessage as ChatMessageType, VoiceVariant, ButtonPosition } from '@/types';
 import './index.css';
 
 const generalResponses = [
@@ -42,11 +42,33 @@ export default function App() {
     const [isVoiceActive, setIsVoiceActive] = useState(false);
     const [voiceIntensity, setVoiceIntensity] = useState(0);
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [buttonPosition, setButtonPosition] = useState<ButtonPosition>(() => {
+        const saved = localStorage.getItem('expertai-button-position');
+        if (saved && ['none', 'header', 'actionbar', 'floating'].includes(saved)) {
+            return saved as ButtonPosition;
+        }
+        // Page-specific defaults: 'none' for Chat, 'actionbar' for Split
+        const viewSaved = localStorage.getItem('expertai-view');
+        return viewSaved === 'split' ? 'actionbar' : 'none';
+    });
 
     // Persist view preference
     useEffect(() => {
         localStorage.setItem('expertai-view', splitView ? 'split' : 'chat');
     }, [splitView]);
+
+    // Persist button position preference
+    useEffect(() => {
+        localStorage.setItem('expertai-button-position', buttonPosition);
+    }, [buttonPosition]);
+
+    // Update button position when switching views (only if position hasn't been manually set)
+    const handleViewChange = (isSplit: boolean) => {
+        setSplitView(isSplit);
+        // Set page-specific default position when switching views
+        const defaultPosition = isSplit ? 'actionbar' : 'none';
+        setButtonPosition(defaultPosition);
+    };
 
     const handleVoiceStateChange = useCallback((isVoiceMode: boolean, intensity: number) => {
         setIsVoiceActive(isVoiceMode);
@@ -111,7 +133,7 @@ export default function App() {
                 {/* Left Side - Navigation */}
                 <nav className="flex items-center gap-1">
                     <button
-                        onClick={() => setSplitView(false)}
+                        onClick={() => handleViewChange(false)}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${!splitView
                             ? 'bg-gray-100 text-gray-900'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -120,7 +142,7 @@ export default function App() {
                         Chat
                     </button>
                     <button
-                        onClick={() => setSplitView(true)}
+                        onClick={() => handleViewChange(true)}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${splitView
                             ? 'bg-gray-100 text-gray-900'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -140,7 +162,7 @@ export default function App() {
                     >
                         <Settings size={20} className="text-gray-700" />
                     </button>
-                    <ExpertButton label="Ask Expert AI" />
+                    {buttonPosition === 'header' && <ExpertButton label="Ask Expert AI" onClick={() => splitView && setChatPanelOpen(true)} />}
                 </div>
             </div>
 
@@ -151,6 +173,8 @@ export default function App() {
                 title="Settings"
                 voiceVariant={voiceVariant}
                 onVoiceVariantChange={setVoiceVariant}
+                buttonPosition={buttonPosition}
+                onButtonPositionChange={setButtonPosition}
             />
 
             {/* Main Layout */}
@@ -159,7 +183,7 @@ export default function App() {
                 <div className="flex-1 flex overflow-hidden bg-white">
                     {/* Left Panel - Content Area */}
                     <div
-                        className="bg-white flex overflow-hidden"
+                        className="bg-white flex overflow-hidden relative"
                         style={{
                             width: chatPanelOpen ? `${100 - splitWidth}%` : '100%',
                             maxWidth: chatPanelOpen ? undefined : '1200px',
@@ -171,9 +195,20 @@ export default function App() {
                             <div className="text-gray-400 text-lg">Content Area</div>
                         </div>
 
-                        {/* Vertical Action Bar */}
-                        <div className="flex items-start pt-4 flex-shrink-0">
-                            <ActionBar onNewChat={handleNewChat} onStartChat={() => setChatPanelOpen(true)} />
+                        {/* Floating Button - lower right corner */}
+                        {buttonPosition === 'floating' && (
+                            <div className="absolute bottom-6 right-6 z-20">
+                                <ExpertButton label="Ask Expert AI" onClick={() => setChatPanelOpen(true)} />
+                            </div>
+                        )}
+
+                        {/* Vertical Action Bar - positioned to align with header settings icon */}
+                        <div className="absolute top-4 right-[22px] z-10">
+                            <ActionBar
+                                onNewChat={handleNewChat}
+                                onStartChat={() => setChatPanelOpen(true)}
+                                showExpertButton={buttonPosition === 'actionbar'}
+                            />
                         </div>
                     </div>
 

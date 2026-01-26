@@ -5,6 +5,7 @@ import { ExpertButton } from './ExpertButton';
 interface ActionBarProps {
     onNewChat?: () => void;
     onStartChat?: () => void;
+    showExpertButton?: boolean;
 }
 
 const actionButtons = [
@@ -15,7 +16,7 @@ const actionButtons = [
     { icon: Settings, label: 'Settings', action: 'settings' },
 ] as const;
 
-export function ActionBar({ onNewChat, onStartChat }: ActionBarProps) {
+export function ActionBar({ onNewChat, onStartChat, showExpertButton = true }: ActionBarProps) {
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +52,7 @@ export function ActionBar({ onNewChat, onStartChat }: ActionBarProps) {
     };
 
     return (
-        <div className="flex flex-col items-center gap-2 p-2">
+        <div className="flex flex-col items-center gap-2">
             {actionButtons.map(({ icon: Icon, label, action }) => (
                 <button
                     key={action}
@@ -65,27 +66,29 @@ export function ActionBar({ onNewChat, onStartChat }: ActionBarProps) {
             ))}
 
             {/* Expert AI Button with Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-                <div onClick={() => setShowDropdown(!showDropdown)}>
-                    <ExpertButton />
-                </div>
-
-                {/* Dropdown Menu */}
-                {showDropdown && (
-                    <div
-                        className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-[#DADADA] overflow-hidden min-w-[160px] z-50 py-2"
-                        style={{ borderRadius: '8px' }}
-                    >
-                        <button
-                            className="w-full px-4 h-8 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
-                            onClick={handleStartChat}
-                        >
-                            <MessageCircle size={18} className="text-gray-500" />
-                            <span className="text-sm">Start a chat</span>
-                        </button>
+            {showExpertButton && (
+                <div className="relative" ref={dropdownRef}>
+                    <div onClick={() => setShowDropdown(!showDropdown)}>
+                        <ExpertButton />
                     </div>
-                )}
-            </div>
+
+                    {/* Dropdown Menu */}
+                    {showDropdown && (
+                        <div
+                            className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-[#DADADA] overflow-hidden min-w-[160px] z-50 py-2"
+                            style={{ borderRadius: '8px' }}
+                        >
+                            <button
+                                className="w-full px-4 h-8 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                onClick={handleStartChat}
+                            >
+                                <MessageCircle size={18} className="text-gray-500" />
+                                <span className="text-sm">Start a chat</span>
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type VoiceVariant = 'waveform' | 'glow' | 'moving-glow' | 'intelligence';
+type ButtonPosition = 'none' | 'header' | 'actionbar' | 'floating';
 
 interface SideModalProps {
     isOpen: boolean;
@@ -11,6 +11,8 @@ interface SideModalProps {
     children?: React.ReactNode;
     voiceVariant?: VoiceVariant;
     onVoiceVariantChange?: (variant: VoiceVariant) => void;
+    buttonPosition?: ButtonPosition;
+    onButtonPositionChange?: (position: ButtonPosition) => void;
 }
 
 const voiceVariants: { value: VoiceVariant; label: string }[] = [
@@ -20,6 +22,13 @@ const voiceVariants: { value: VoiceVariant; label: string }[] = [
     { value: 'intelligence', label: 'Intelligence' },
 ];
 
+const buttonPositions: { value: ButtonPosition; label: string }[] = [
+    { value: 'none', label: 'None' },
+    { value: 'header', label: 'Banner' },
+    { value: 'actionbar', label: 'Vertical Action Bar' },
+    { value: 'floating', label: 'Floating Button' },
+];
+
 export function SideModal({
     isOpen,
     onClose,
@@ -27,6 +36,8 @@ export function SideModal({
     children,
     voiceVariant = 'waveform',
     onVoiceVariantChange,
+    buttonPosition = 'header',
+    onButtonPositionChange,
 }: SideModalProps) {
     return (
         <AnimatePresence>
@@ -77,52 +88,101 @@ export function SideModal({
 
                         <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
                             {children || (
-                                <div style={{ marginBottom: '24px' }}>
-                                    <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '12px', marginTop: 0 }}>
-                                        Voice Input Style
-                                    </h3>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        {voiceVariants.map(({ value, label }) => (
-                                            <button
-                                                key={value}
-                                                onClick={() => onVoiceVariantChange?.(value)}
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '12px',
-                                                    padding: '12px 16px',
-                                                    borderRadius: '8px',
-                                                    border: voiceVariant === value ? '2px solid #111827' : '1px solid #DADADA',
-                                                    backgroundColor: voiceVariant === value ? '#F9FAFB' : '#ffffff',
-                                                    cursor: 'pointer',
-                                                    textAlign: 'left',
-                                                    transition: 'all 0.15s ease',
-                                                }}
-                                            >
-                                                {/* Radio button */}
-                                                <div
+                                <>
+                                    <div style={{ marginBottom: '24px' }}>
+                                        <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '12px', marginTop: 0, textAlign: 'left' }}>
+                                            Expert AI Call to Action Position
+                                        </h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            {buttonPositions.map(({ value, label }) => (
+                                                <button
+                                                    key={value}
+                                                    onClick={() => onButtonPositionChange?.(value)}
                                                     style={{
-                                                        width: '18px',
-                                                        height: '18px',
-                                                        borderRadius: '50%',
-                                                        border: voiceVariant === value ? '2px solid #111827' : '2px solid #9ca3af',
                                                         display: 'flex',
                                                         alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        flexShrink: 0,
+                                                        gap: '12px',
+                                                        padding: '12px 16px',
+                                                        borderRadius: '8px',
+                                                        border: buttonPosition === value ? '2px solid #111827' : '1px solid #DADADA',
+                                                        backgroundColor: buttonPosition === value ? '#F9FAFB' : '#ffffff',
+                                                        cursor: 'pointer',
+                                                        textAlign: 'left',
+                                                        transition: 'all 0.15s ease',
                                                     }}
                                                 >
-                                                    {voiceVariant === value && (
-                                                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#111827' }} />
-                                                    )}
-                                                </div>
-                                                <span style={{ fontSize: '14px', fontWeight: voiceVariant === value ? 500 : 400, color: '#111827' }}>
-                                                    {label}
-                                                </span>
-                                            </button>
-                                        ))}
+                                                    {/* Radio button */}
+                                                    <div
+                                                        style={{
+                                                            width: '18px',
+                                                            height: '18px',
+                                                            borderRadius: '50%',
+                                                            border: buttonPosition === value ? '2px solid #111827' : '2px solid #9ca3af',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexShrink: 0,
+                                                        }}
+                                                    >
+                                                        {buttonPosition === value && (
+                                                            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#111827' }} />
+                                                        )}
+                                                    </div>
+                                                    <span style={{ fontSize: '14px', fontWeight: buttonPosition === value ? 500 : 400, color: '#111827' }}>
+                                                        {label}
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+
+                                    <div style={{ marginBottom: '24px' }}>
+                                        <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '12px', marginTop: 0, textAlign: 'left' }}>
+                                            Voice Input Style
+                                        </h3>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            {voiceVariants.map(({ value, label }) => (
+                                                <button
+                                                    key={value}
+                                                    onClick={() => onVoiceVariantChange?.(value)}
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '12px',
+                                                        padding: '12px 16px',
+                                                        borderRadius: '8px',
+                                                        border: voiceVariant === value ? '2px solid #111827' : '1px solid #DADADA',
+                                                        backgroundColor: voiceVariant === value ? '#F9FAFB' : '#ffffff',
+                                                        cursor: 'pointer',
+                                                        textAlign: 'left',
+                                                        transition: 'all 0.15s ease',
+                                                    }}
+                                                >
+                                                    {/* Radio button */}
+                                                    <div
+                                                        style={{
+                                                            width: '18px',
+                                                            height: '18px',
+                                                            borderRadius: '50%',
+                                                            border: voiceVariant === value ? '2px solid #111827' : '2px solid #9ca3af',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            flexShrink: 0,
+                                                        }}
+                                                    >
+                                                        {voiceVariant === value && (
+                                                            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#111827' }} />
+                                                        )}
+                                                    </div>
+                                                    <span style={{ fontSize: '14px', fontWeight: voiceVariant === value ? 500 : 400, color: '#111827' }}>
+                                                        {label}
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
                             )}
                         </div>
                     </motion.div>
