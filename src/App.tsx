@@ -312,10 +312,10 @@ Would you like me to elaborate on any specific aspect of this topic?`;
             {/* Main Layout */}
             {splitView ? (
                 /* Split View Mode */
-                <div className="flex-1 flex overflow-hidden bg-white">
+                <div className={`flex-1 flex bg-white ${chatPanelOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
                     {/* Left Panel - Content Area */}
                     <div
-                        className="bg-white flex overflow-hidden relative"
+                        className={`bg-white flex relative ${chatPanelOpen ? 'overflow-hidden' : ''}`}
                         style={{
                             width: chatPanelOpen ? `${100 - splitWidth}%` : '100%',
                             maxWidth: chatPanelOpen ? undefined : '1200px',
@@ -323,7 +323,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                         }}
                     >
                         {/* Main Content */}
-                        <div ref={contentRef} className="flex-1 overflow-y-auto p-8 pr-20 relative">
+                        <div ref={contentRef} className={`flex-1 p-8 pr-20 relative ${chatPanelOpen ? 'overflow-y-auto' : 'overflow-visible'}`}>
                             <SelectionTooltip
                                 containerRef={contentRef}
                                 onChatAboutSelection={handleChatAboutSelection}
