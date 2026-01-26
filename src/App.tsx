@@ -193,7 +193,7 @@ export default function App() {
                     >
                         {/* Main Content */}
                         <div className="flex-1 overflow-y-auto p-8 pr-20">
-                            <div className="max-w-3xl text-left">
+                            <div className="max-w-3xl mx-auto text-left">
                                 {/* Big Header */}
                                 <h1 className="font-medium mb-8" style={{ fontSize: '28px', color: '#232323' }}>
                                     Welcome to Expert AI
@@ -389,7 +389,7 @@ export default function App() {
 
                             {/* Chat Messages or Welcome */}
                             {chatStarted ? (
-                                <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4">
+                                <div className="flex-1 overflow-y-auto px-4 pt-12 pb-4">
                                     <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                         {messages.map((msg) => (
                                             <ChatMessage key={msg.id} message={msg} />
