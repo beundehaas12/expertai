@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { X, Settings, ArrowDown } from 'lucide-react';
 import { VoiceInput } from '@/components/voice';
-import { ChatMessage, TypingIndicator } from '@/components/chat';
+import { ChatMessage, TypingIndicator, PendingIndicator } from '@/components/chat';
 import { ActionBar, ExpertButton, SideModal, SelectionTooltip } from '@/components/ui';
 import type { ChatMessage as ChatMessageType, VoiceVariant, ButtonPosition } from '@/types';
 import './index.css';
@@ -121,9 +121,23 @@ function getRandomDelay() {
 }
 
 export default function App() {
+    // State for managing message queue and AI status
     const [chatStarted, setChatStarted] = useState(false);
     const [messages, setMessages] = useState<ChatMessageType[]>([]);
-    const [isTyping, setIsTyping] = useState(false);
+
+    // Queue System: Stores pending user inputs or actions
+    // userMessage is stored when the message was queued while AI was busy
+    const [pendingQueue, setPendingQueue] = useState<{ id: string, text: string, type: 'text' | 'selection', userMessage?: ChatMessageType }[]>([]);
+
+    // AI Status: 
+    // - 'idle': Doing nothing
+    // - 'thinking': Showing TypingIndicator (Simulating delay)
+    // - 'streaming': Currently printing text (ChatMessage is active)
+    const [aiStatus, setAiStatus] = useState<'idle' | 'thinking' | 'streaming'>('idle');
+
+    // Derived state for existing components using boolean flags
+    const isTyping = aiStatus === 'thinking';
+
     const [voiceVariant, setVoiceVariant] = useState<VoiceVariant>('waveform');
     const [splitView, setSplitView] = useState(() => {
         const saved = localStorage.getItem('expertai-view');
@@ -168,8 +182,8 @@ export default function App() {
         setVoiceIntensity(intensity);
     }, []);
 
+    // 1. INPUT HANDLER: Adds to queue
     const handleSend = useCallback((text: string) => {
-        // Reset scroll to bottom when sending a new message
         shouldAutoScrollRef.current = true;
         setShowScrollButton(false);
 
@@ -180,27 +194,95 @@ export default function App() {
             timestamp: Date.now(),
         };
 
-        setMessages(prev => [...prev, userMessage]);
+        // If AI is busy, queue the message (don't add to messages yet)
+        // If AI is idle, add immediately
+        if (aiStatus !== 'idle') {
+            // AI is busy - queue this message for later, store the full userMessage
+            setPendingQueue(prev => [...prev, {
+                id: userMessage.id,
+                text,
+                type: 'text' as const,
+                userMessage // Store the full message object to render later
+            }]);
+        } else {
+            // AI is idle - add message immediately and queue for processing
+            setMessages(prev => [...prev, userMessage]);
+            setPendingQueue(prev => [...prev, { id: generateId(), text, type: 'text' as const }]);
+        }
         setChatStarted(true);
-        setIsTyping(true);
+    }, [aiStatus]);
 
+    // 2. QUEUE PROCESSOR: Watches Queue + Status
+    useEffect(() => {
+        // Only process if we are IDLE and there are items in queue
+        if (aiStatus === 'idle' && pendingQueue.length > 0) {
+
+            // Lock the processor
+            setAiStatus('thinking');
+
+            const currentRequest = pendingQueue[0];
+            setPendingQueue(prev => prev.slice(1));
+
+            // If this request has a stored userMessage (was queued while busy), add it now
+            if (currentRequest.userMessage) {
+                setMessages(prev => [...prev, currentRequest.userMessage!]);
+            }
+
+            // Simulate Thinking Delay
+            setTimeout(() => {
+                // Determine response type based on request
+                let responseText = getSimulatedResponse();
+                if (currentRequest.type === 'selection') {
+                    if (currentRequest.text.startsWith('# Understanding')) {
+                        responseText = currentRequest.text;
+                    }
+                }
+
+                // Add AI Message -> Transition to 'streaming'
+                const aiMessage: ChatMessageType = {
+                    id: generateId(),
+                    text: responseText,
+                    sender: 'ai',
+                    timestamp: Date.now(),
+                    isStreaming: true,
+                };
+
+                setMessages(prev => [...prev, aiMessage]);
+                setAiStatus('streaming');
+
+            }, getRandomDelay());
+        }
+    }, [aiStatus, pendingQueue]);
+
+    // 3. STREAM COMPLETION HANDLER
+    // Called by ChatMessage when typewriting ends
+    const markStreamComplete = useCallback((messageId: string) => {
+        setMessages(prev => prev.map(msg =>
+            msg.id === messageId ? { ...msg, isStreaming: false } : msg
+        ));
+
+        // IMPORTANT: Free up the AI to process the next item
+        setAiStatus('idle');
+
+        // FORCE SCROLL UPDATE:
+        // MessageActions appears *after* isStreaming becomes false.
+        // We need to wait for it to render and expand the container.
+        // Use a longer delay (200ms) and FORCE scroll regardless of shouldAutoScrollRef.
         setTimeout(() => {
-            setIsTyping(false);
-            const aiMessage: ChatMessageType = {
-                id: generateId(),
-                text: getSimulatedResponse(),
-                sender: 'ai',
-                timestamp: Date.now(),
-                isStreaming: true,
-            };
-            setMessages(prev => [...prev, aiMessage]);
-        }, getRandomDelay());
+            if (chatScrollRef.current) {
+                chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+                setShowScrollButton(false); // Also hide the scroll button
+            }
+        }, 200);
+
     }, []);
+
 
     const handleNewChat = useCallback(() => {
         setMessages([]);
         setChatStarted(false);
-        setIsTyping(false);
+        setPendingQueue([]); // Clear queue
+        setAiStatus('idle'); // Reset status
     }, []);
 
     // Ref for content area (for selection tooltip)
@@ -252,13 +334,6 @@ export default function App() {
         }
     }, []);
 
-    // Mark a message as no longer streaming
-    const markStreamComplete = useCallback((messageId: string) => {
-        setMessages(prev => prev.map(msg =>
-            msg.id === messageId ? { ...msg, isStreaming: false } : msg
-        ));
-    }, []);
-
     // Handle "Chat about this" from text selection
     const handleChatAboutSelection = useCallback((selectedText: string) => {
         // Open chat panel if not already open
@@ -285,7 +360,7 @@ export default function App() {
 
         setMessages(prev => [...prev, userMessage]);
         setChatStarted(true);
-        setIsTyping(true);
+        // setIsTyping(true); // Handled by Queue now
 
         // Generate a long multi-paragraph response with structure
         const topicSnippet = selectedText.slice(0, 50) + (selectedText.length > 50 ? '...' : '');
@@ -329,18 +404,13 @@ If you have any suggestions or encounter any issues, we encourage you to let us 
 
 Would you like me to elaborate on any specific aspect of this topic?`;
 
-        // Simulate AI response
-        setTimeout(() => {
-            setIsTyping(false);
-            const aiMessage: ChatMessageType = {
-                id: generateId(),
-                text: longResponse,
-                sender: 'ai',
-                timestamp: Date.now(),
-                isStreaming: true,
-            };
-            setMessages(prev => [...prev, aiMessage]);
-        }, getRandomDelay());
+        // Push to Queue
+        setPendingQueue(prev => [...prev, {
+            id: generateId(),
+            text: longResponse, // Pass the prepared text
+            type: 'selection'
+        }]);
+
     }, [chatPanelOpen]);
 
     // Update body background when chat starts - instant
@@ -648,6 +718,10 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                         ))}
                                         <AnimatePresence>
                                             {isTyping && <TypingIndicator />}
+                                            {/* Show Pending Bubble if queue has items and we are busy (Thinking or Streaming) */}
+                                            {pendingQueue.length > 0 && (aiStatus === 'thinking' || aiStatus === 'streaming') && (
+                                                <PendingIndicator pendingMessages={pendingQueue.filter(q => q.userMessage).map(q => q.userMessage!)} />
+                                            )}
                                         </AnimatePresence>
                                     </div>
                                 </div>
@@ -702,6 +776,10 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                 ))}
                                 <AnimatePresence>
                                     {isTyping && <TypingIndicator />}
+                                    {/* Show Pending Bubble if queue has items and we are busy (Thinking or Streaming) */}
+                                    {pendingQueue.length > 0 && (aiStatus === 'thinking' || aiStatus === 'streaming') && (
+                                        <PendingIndicator pendingMessages={pendingQueue.filter(q => q.userMessage).map(q => q.userMessage!)} />
+                                    )}
                                 </AnimatePresence>
                             </div>
                         </div>
