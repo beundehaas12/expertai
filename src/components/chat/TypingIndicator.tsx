@@ -1,19 +1,34 @@
 import { motion } from 'framer-motion';
 
 export function TypingIndicator() {
-    // Each petal animates with a staggered delay for a "breathing" effect
-    const petalVariants = {
-        initial: { scale: 0.8, opacity: 0.6 },
-        animate: { scale: 1, opacity: 1 },
-    };
+    // "Perfect Morph" Loading Animation
+    // Morphs between the "Spark" logo and a spinning "Broken Ring".
+    // - Spark: Static start shape (0deg).
+    // - Ring: Spinning circle (360deg) with gaps.
+    // - Morph: Smooth path interpolation using easeInOut.
 
-    const petalTransition = (delay: number) => ({
-        duration: 0.6,
-        repeat: Infinity,
-        repeatType: 'reverse' as const,
-        ease: 'easeInOut',
-        delay,
-    });
+    const SPARK_GREEN = "M29.71 16.83 C23.90 27.22 12.68 34.08 0 34.08 L0 29.92 C12.47 29.92 23.06 22.44 27.64 11.64 C28.05 13.09 28.68 14.34 29.71 16.83 Z";
+    const SPARK_RED = "M47.38 29.71 C36.99 23.90 29.92 12.68 29.92 0 L34.08 0 C34.08 12.47 41.56 23.06 52.36 27.64 C50.91 28.05 49.66 28.68 47.38 29.71 Z";
+    const SPARK_BLUE = "M34.29 47.38 C40.10 36.99 51.32 30.13 64.00 30.13 L64.00 34.28 C51.53 34.28 40.93 41.77 36.36 52.57 C35.95 51.12 35.32 49.87 34.29 47.38 Z";
+    const SPARK_BLACK = "M16.83 34.29 C27.22 40.10 34.08 51.32 34.08 64.00 L29.92 64.00 C29.92 51.53 22.44 40.93 11.64 36.36 C13.09 35.95 14.34 35.32 16.83 34.29 Z";
+
+    // Ring Sectors with GAPS
+    const RING_GREEN = "M2 28 C2 16 16 2 28 2 L28 6 C18 6 6 18 6 28 C6 28 4 28 2 28 Z";
+    const RING_RED = "M36 2 C48 2 62 16 62 28 L58 28 C58 18 46 6 36 6 C36 6 36 4 36 2 Z";
+    const RING_BLUE = "M62 36 C62 48 48 62 36 62 L36 58 C46 58 58 46 58 36 C58 36 60 36 62 36 Z";
+    const RING_BLACK = "M28 62 C16 62 2 48 2 36 L6 36 C6 46 18 58 28 58 C28 58 28 60 28 62 Z";
+
+    // Easing: Smooth start/stop.
+    const SMOOTH_EASE = "easeInOut";
+    const DURATION = 2.0;
+
+    // Timeline: 
+    // 0.0: Spark (Static)
+    // 0.3: Ring Formed
+    // 0.3-0.7: Ring SPINS
+    // 0.7: Ring Stops
+    // 1.0: Morph back
+    const TIMES = [0, 0.3, 0.7, 1];
 
     return (
         <motion.div
@@ -22,56 +37,54 @@ export function TypingIndicator() {
             exit={{ opacity: 0, y: -10 }}
             className="self-start flex items-center gap-3 py-3"
         >
-            {/* Animated Spark with individual petal animations */}
-            <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clipPath="url(#clip0_typing)">
-                    {/* Green petal - top left */}
-                    <motion.path
-                        d="M29.7143 16.8315C23.8961 27.2211 12.6753 34.0783 0 34.0783V29.9224C12.4675 29.9224 23.0649 22.4419 27.6364 11.6367C27.6364 11.6367 28.0519 13.0913 28.6753 14.338C29.2987 15.5848 29.7143 16.8315 29.7143 16.8315Z"
-                        fill="#85BC20"
-                        variants={petalVariants}
-                        initial="initial"
-                        animate="animate"
-                        transition={petalTransition(0)}
-                        style={{ transformOrigin: '32px 32px' }}
-                    />
-                    {/* Red petal - top right */}
-                    <motion.path
-                        d="M47.3764 29.7143C36.9868 23.8961 29.9219 12.6753 29.9219 0H34.0777C34.0777 12.4675 41.5582 23.0649 52.3634 27.6364C52.3634 27.6364 50.9089 28.0519 49.6621 28.6753C48.4154 29.2987 47.3764 29.7143 47.3764 29.7143Z"
-                        fill="#E5202E"
-                        variants={petalVariants}
-                        initial="initial"
-                        animate="animate"
-                        transition={petalTransition(0.15)}
-                        style={{ transformOrigin: '32px 32px' }}
-                    />
-                    {/* Blue petal - bottom right */}
-                    <motion.path
-                        d="M34.2852 47.3757C40.1033 36.986 51.3241 30.1289 63.9994 30.1289V34.2848C51.5319 34.2848 40.9345 41.7653 36.3631 52.5705C36.3631 52.5705 35.9475 51.1159 35.3241 49.8692C34.7007 48.6224 34.2852 47.5835 34.2852 47.5835V47.3757Z"
-                        fill="#007AC3"
-                        variants={petalVariants}
-                        initial="initial"
-                        animate="animate"
-                        transition={petalTransition(0.3)}
-                        style={{ transformOrigin: '32px 32px' }}
-                    />
-                    {/* Black petal - bottom left */}
-                    <motion.path
-                        d="M16.8315 34.2852C27.2211 40.1033 34.0783 51.3241 34.0783 63.9994H29.9224C29.9224 51.5319 22.4419 40.9345 11.6367 36.3631C11.6367 36.3631 13.0913 35.9475 14.338 35.3241C15.5848 34.7007 16.8315 34.2852 16.8315 34.2852Z"
-                        fill="#232323"
-                        variants={petalVariants}
-                        initial="initial"
-                        animate="animate"
-                        transition={petalTransition(0.45)}
-                        style={{ transformOrigin: '32px 32px' }}
-                    />
-                </g>
-                <defs>
-                    <clipPath id="clip0_typing">
-                        <rect width="64" height="64" fill="white" />
-                    </clipPath>
-                </defs>
-            </svg>
+            <div className="relative w-6 h-6">
+                <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="overflow-visible">
+                    <motion.g
+                        clipPath="url(#clip0_typing)"
+                        animate={{
+                            rotate: [0, 0, 360, 360]
+                        }}
+                        transition={{
+                            duration: DURATION,
+                            repeat: Infinity,
+                            times: TIMES,
+                            ease: "easeInOut"
+                        }}
+                        style={{ originX: '32px', originY: '32px', transformBox: 'view-box' }}
+                    >
+                        {/* Green */}
+                        <motion.path
+                            fill="#85BC20"
+                            animate={{ d: [SPARK_GREEN, RING_GREEN, RING_GREEN, SPARK_GREEN] }}
+                            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
+                        />
+                        {/* Red */}
+                        <motion.path
+                            fill="#E5202E"
+                            animate={{ d: [SPARK_RED, RING_RED, RING_RED, SPARK_RED] }}
+                            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
+                        />
+                        {/* Blue */}
+                        <motion.path
+                            fill="#007AC3"
+                            animate={{ d: [SPARK_BLUE, RING_BLUE, RING_BLUE, SPARK_BLUE] }}
+                            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
+                        />
+                        {/* Black */}
+                        <motion.path
+                            fill="#232323"
+                            animate={{ d: [SPARK_BLACK, RING_BLACK, RING_BLACK, SPARK_BLACK] }}
+                            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
+                        />
+                    </motion.g>
+                    <defs>
+                        <clipPath id="clip0_typing">
+                            <rect width="64" height="64" fill="white" />
+                        </clipPath>
+                    </defs>
+                </svg>
+            </div>
+
             {/* Thinking text */}
             <span className="text-gray-500 text-sm font-medium">Thinking...</span>
         </motion.div>

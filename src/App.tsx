@@ -144,6 +144,7 @@ export default function App() {
         return viewSaved === 'split' ? 'actionbar' : 'none';
     });
 
+
     // Persist view preference
     useEffect(() => {
         localStorage.setItem('expertai-view', splitView ? 'split' : 'chat');
