@@ -429,12 +429,12 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                         }}
                     >
                         {/* Main Content */}
-                        <div ref={contentRef} className={`flex-1 p-8 pr-20 relative ${chatPanelOpen ? 'overflow-y-auto' : 'overflow-visible'}`}>
+                        <div ref={contentRef} className={`flex-1 p-8 pr-20 relative ${chatPanelOpen ? 'overflow-y-auto pb-24' : 'pb-8'}`}>
                             <SelectionTooltip
                                 containerRef={contentRef}
                                 onChatAboutSelection={handleChatAboutSelection}
                             />
-                            <div className="max-w-3xl mx-auto text-left">
+                            <div className={`max-w-3xl mx-auto text-left ${chatPanelOpen ? 'mb-24' : 'mb-8'}`}>
                                 {/* Big Header */}
                                 <h1 className="font-medium mb-8" style={{ fontSize: '28px', color: '#232323' }}>
                                     Welcome to Expert AI
@@ -556,15 +556,20 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                 <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
                                     Contact & Support
                                 </h2>
-                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                <p className="text-base" style={{ color: '#232323', lineHeight: '24px' }}>
                                     Duis sapien sem, aliquet sed, consequat eget, convallis quis, turpis. Suspendisse sed velit vel urna cursus ultricies. Proin laoreet libero lacinia erat congue, sed accumsan sem vestibulum eu. Etiam at risus et justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet.
                                 </p>
+                                {/* Bottom spacer when chat is collapsed */}
+                                {!chatPanelOpen && <div className="h-8" />}
                             </div>
                         </div>
 
-                        {/* Floating Button - lower right corner */}
+                        {/* Floating Button - fixed to bottom of content area */}
                         {buttonPosition === 'floating' && (
-                            <div className="absolute bottom-6 right-6 z-20">
+                            <div
+                                className="fixed bottom-6 z-50"
+                                style={{ right: chatPanelOpen ? `calc(${splitWidth}% + 24px)` : '24px' }}
+                            >
                                 <ExpertButton label="Ask Expert AI" onClick={() => setChatPanelOpen(true)} className="shadow-lg" />
                             </div>
                         )}
