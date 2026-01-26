@@ -239,7 +239,7 @@ export default function App() {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex-1 flex flex-col items-center justify-center">
+                                <div className="flex-1 flex flex-col items-center justify-center px-4">
                                     <img
                                         src="./img/expert-ai-spark.svg"
                                         alt=""
