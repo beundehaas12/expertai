@@ -27,8 +27,8 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
                 {isStreaming ? (
                     <StreamingText
                         text={message.text}
-                        speed={4}
-                        interval={25}
+                        speed={8}
+                        interval={20}
                         onComplete={onStreamComplete}
                         onUpdate={onStreamUpdate}
                     />

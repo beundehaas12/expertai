@@ -8,17 +8,104 @@ import type { ChatMessage as ChatMessageType, VoiceVariant, ButtonPosition } fro
 import './index.css';
 
 const generalResponses = [
-    "That's interesting! Tell me more.",
-    "I understand. How else can I assist you?",
-    "Could you elaborate on that?",
-    "I'm here to listen and help.",
-    "That's a great point.",
-    "I see. Please go on.",
-    "Interesting perspective.",
-    "Is there anything specific you'd like to discuss?",
-    "I'm ready to help with whatever is on your mind.",
-    "Okay, I'm listening.",
+    `That's a great question! Let me share some thoughts.
+
+## Key Points
+
+There are several aspects to consider here:
+
+• First, it's important to understand the context
+• Second, consider the different perspectives involved
+• Third, think about the practical implications
+
+Would you like me to elaborate on any of these points?`,
+
+    `I'd be happy to help with that!
+
+## Here's What I Found
+
+Based on your question, here are some relevant insights:
+
+1. Start by identifying the core issue
+2. Break it down into smaller, manageable parts
+3. Address each component systematically
+4. Review the overall solution for consistency
+
+Let me know if you need more specific guidance on any step.`,
+
+    `Interesting perspective! Here's my take on it.
+
+## Analysis
+
+Your question touches on some important themes. Let me break it down:
+
+**The Main Idea**
+Understanding this requires looking at both the big picture and the details. The key is finding the right balance.
+
+**Practical Application**
+Once you grasp the fundamentals, applying them becomes much easier. Practice and iteration are essential.
+
+Is there a specific aspect you'd like to explore further?`,
+
+    `That makes sense. Let me provide some context.
+
+## Overview
+
+This is a common scenario that many people encounter. Here's how I'd approach it:
+
+• **Step 1**: Gather all relevant information
+• **Step 2**: Identify the main constraints
+• **Step 3**: Explore possible solutions
+• **Step 4**: Evaluate trade-offs
+• **Step 5**: Make an informed decision
+
+Each step builds on the previous one. Want me to walk through any of these in detail?`,
+
+    `I understand what you're asking. Here's a comprehensive response.
+
+## Summary
+
+Your question relates to a topic that has multiple dimensions:
+
+1. **Theoretical Foundation**: Understanding the underlying principles
+2. **Practical Considerations**: Real-world factors that affect implementation
+3. **Best Practices**: Proven approaches that tend to work well
+
+## Recommendation
+
+I'd suggest starting with the basics and gradually building up your knowledge. This approach tends to lead to better long-term understanding.
+
+Feel free to ask follow-up questions!`,
+
+    `Great point! Let me expand on that.
+
+The topic you've raised is quite nuanced. There are different schools of thought, and the "right" answer often depends on your specific situation.
+
+## Things to Consider
+
+When thinking about this, keep in mind:
+
+• Your specific goals and constraints
+• The resources available to you
+• The timeline you're working with
+• Potential risks and how to mitigate them
+
+Would you like to discuss any of these factors in more detail?`,
+
+    // Short responses for variety
+    "That's a great point! I completely agree with your perspective.",
+
+    "Interesting! Could you tell me more about what you're trying to achieve?",
+
+    "I see what you mean. Let me know if you have any follow-up questions.",
+
+    "That makes sense. How can I help you further with this?",
+
+    "Good question! The answer really depends on your specific context and needs.",
+
+    "I understand. Feel free to share more details whenever you're ready.",
 ];
+
 
 function generateId() {
     return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -26,6 +113,11 @@ function generateId() {
 
 function getSimulatedResponse() {
     return generalResponses[Math.floor(Math.random() * generalResponses.length)];
+}
+
+function getRandomDelay() {
+    // Random delay between 500ms and 2500ms
+    return 500 + Math.random() * 2000;
 }
 
 export default function App() {
@@ -76,6 +168,10 @@ export default function App() {
     }, []);
 
     const handleSend = useCallback((text: string) => {
+        // Reset scroll to bottom when sending a new message
+        shouldAutoScrollRef.current = true;
+        setShowScrollButton(false);
+
         const userMessage: ChatMessageType = {
             id: generateId(),
             text,
@@ -94,9 +190,10 @@ export default function App() {
                 text: getSimulatedResponse(),
                 sender: 'ai',
                 timestamp: Date.now(),
+                isStreaming: true,
             };
             setMessages(prev => [...prev, aiMessage]);
-        }, 1500);
+        }, getRandomDelay());
     }, []);
 
     const handleNewChat = useCallback(() => {
@@ -168,6 +265,15 @@ export default function App() {
             setChatPanelOpen(true);
         }
 
+        // Reset scroll to bottom when starting a new question
+        shouldAutoScrollRef.current = true;
+        setShowScrollButton(false);
+        setTimeout(() => {
+            if (chatScrollRef.current) {
+                chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+            }
+        }, 100);
+
         // Create a user message with the selected text
         const userMessage: ChatMessageType = {
             id: generateId(),
@@ -233,7 +339,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                 isStreaming: true,
             };
             setMessages(prev => [...prev, aiMessage]);
-        }, 2500);
+        }, getRandomDelay());
     }, [chatPanelOpen]);
 
     // Update body background when chat starts - instant
