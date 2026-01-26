@@ -1,12 +1,16 @@
 import type { ChatMessage as ChatMessageType } from '@/types';
 import { MessageActions } from './MessageActions';
+import { StreamingText } from './StreamingText';
 
 interface ChatMessageProps {
     message: ChatMessageType;
+    onStreamComplete?: () => void;
+    onStreamUpdate?: () => void;
 }
 
-export function ChatMessage({ message }: ChatMessageProps) {
+export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatMessageProps) {
     const isUser = message.sender === 'user';
+    const isStreaming = message.isStreaming && !isUser;
 
     return (
         <div className={`max-w-[80%] ${isUser ? 'self-end' : 'self-start'}`}>
@@ -19,9 +23,19 @@ export function ChatMessage({ message }: ChatMessageProps) {
                     }
           `}
             >
-                {message.text}
+                {isStreaming ? (
+                    <StreamingText
+                        text={message.text}
+                        speed={4}
+                        interval={25}
+                        onComplete={onStreamComplete}
+                        onUpdate={onStreamUpdate}
+                    />
+                ) : (
+                    message.text
+                )}
             </div>
-            {!isUser && <MessageActions messageId={message.id} />}
+            {!isUser && !isStreaming && <MessageActions messageId={message.id} />}
         </div>
     );
 }

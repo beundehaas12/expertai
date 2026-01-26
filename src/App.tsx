@@ -118,6 +118,13 @@ export default function App() {
         }
     }, [messages, isTyping]);
 
+    // Scroll to bottom callback for streaming text
+    const scrollToBottom = useCallback(() => {
+        if (chatScrollRef.current) {
+            chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+        }
+    }, []);
+
     // Handle "Chat about this" from text selection
     const handleChatAboutSelection = useCallback((selectedText: string) => {
         // Open chat panel if not already open
@@ -137,17 +144,32 @@ export default function App() {
         setChatStarted(true);
         setIsTyping(true);
 
+        // Generate a long multi-paragraph response
+        const topicSnippet = selectedText.slice(0, 50) + (selectedText.length > 50 ? '...' : '');
+        const longResponse = `Great question! Let me explain "${topicSnippet}" in more detail.
+
+This concept is fundamental to understanding how our platform operates. When we talk about this topic, we're referring to a core principle that guides the way information is processed and delivered to you. The underlying technology uses advanced algorithms to ensure accuracy and relevance in every interaction.
+
+From a practical standpoint, this means you can expect consistent, high-quality results whenever you engage with this feature. Our team has spent considerable time refining the approach to make sure it meets the needs of diverse users across different contexts. Whether you're looking for quick answers or in-depth analysis, the system adapts to your requirements.
+
+Additionally, there are several best practices we recommend when working with this aspect of the platform. First, be as specific as possible in your queries—this helps the system understand exactly what you're looking for. Second, don't hesitate to ask follow-up questions if the initial response doesn't fully address your needs. The conversational interface is designed to handle iterative refinement of your questions.
+
+Finally, it's worth noting that this feature is continuously improving. We regularly incorporate user feedback and update our models to provide even better responses over time. If you have any suggestions or encounter any issues, we encourage you to let us know through the feedback mechanisms available in the application.
+
+Would you like me to elaborate on any specific aspect of this topic, or do you have related questions I can help with?`;
+
         // Simulate AI response
         setTimeout(() => {
             setIsTyping(false);
             const aiMessage: ChatMessageType = {
                 id: generateId(),
-                text: `I'd be happy to explain more about "${selectedText.slice(0, 50)}${selectedText.length > 50 ? '...' : ''}". This is an interesting topic that relates to how our platform can help you achieve better results. Would you like me to go into more detail on any specific aspect?`,
+                text: longResponse,
                 sender: 'ai',
                 timestamp: Date.now(),
+                isStreaming: true,
             };
             setMessages(prev => [...prev, aiMessage]);
-        }, 1500);
+        }, 1000);
     }, [chatPanelOpen]);
 
     // Update body background when chat starts - instant
@@ -441,7 +463,11 @@ export default function App() {
                                 <div ref={chatScrollRef} className="flex-1 overflow-y-auto px-8 pt-12 pb-4">
                                     <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                         {messages.map((msg) => (
-                                            <ChatMessage key={msg.id} message={msg} />
+                                            <ChatMessage
+                                                key={msg.id}
+                                                message={msg}
+                                                onStreamUpdate={scrollToBottom}
+                                            />
                                         ))}
                                         <AnimatePresence>
                                             {isTyping && <TypingIndicator />}
@@ -479,7 +505,11 @@ export default function App() {
                         <div ref={chatScrollRef} className="flex-1 overflow-y-auto px-8 pt-6 pb-4">
                             <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                 {messages.map((msg) => (
-                                    <ChatMessage key={msg.id} message={msg} />
+                                    <ChatMessage
+                                        key={msg.id}
+                                        message={msg}
+                                        onStreamUpdate={scrollToBottom}
+                                    />
                                 ))}
                                 <AnimatePresence>
                                     {isTyping && <TypingIndicator />}

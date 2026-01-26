@@ -12,6 +12,7 @@ export interface ChatMessage {
     text: string;
     sender: MessageSender;
     timestamp: number;
+    isStreaming?: boolean;
 }
 
 // Voice input state
