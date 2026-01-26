@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { X, Settings } from 'lucide-react';
 import { VoiceInput } from '@/components/voice';
 import { ChatMessage, TypingIndicator } from '@/components/chat';
-import { ActionBar, ExpertButton, SideModal } from '@/components/ui';
+import { ActionBar, ExpertButton, SideModal, SelectionTooltip } from '@/components/ui';
 import type { ChatMessage as ChatMessageType, VoiceVariant, ButtonPosition } from '@/types';
 import './index.css';
 
@@ -105,6 +105,41 @@ export default function App() {
         setIsTyping(false);
     }, []);
 
+    // Ref for content area (for selection tooltip)
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    // Handle "Chat about this" from text selection
+    const handleChatAboutSelection = useCallback((selectedText: string) => {
+        // Open chat panel if not already open
+        if (!chatPanelOpen) {
+            setChatPanelOpen(true);
+        }
+
+        // Create a user message with the selected text
+        const userMessage: ChatMessageType = {
+            id: generateId(),
+            text: `Tell me more about: "${selectedText}"`,
+            sender: 'user',
+            timestamp: Date.now(),
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setChatStarted(true);
+        setIsTyping(true);
+
+        // Simulate AI response
+        setTimeout(() => {
+            setIsTyping(false);
+            const aiMessage: ChatMessageType = {
+                id: generateId(),
+                text: `I'd be happy to explain more about "${selectedText.slice(0, 50)}${selectedText.length > 50 ? '...' : ''}". This is an interesting topic that relates to how our platform can help you achieve better results. Would you like me to go into more detail on any specific aspect?`,
+                sender: 'ai',
+                timestamp: Date.now(),
+            };
+            setMessages(prev => [...prev, aiMessage]);
+        }, 1500);
+    }, [chatPanelOpen]);
+
     // Update body background when chat starts - instant
     useEffect(() => {
         if (chatStarted) {
@@ -192,7 +227,11 @@ export default function App() {
                         }}
                     >
                         {/* Main Content */}
-                        <div className="flex-1 overflow-y-auto p-8 pr-20">
+                        <div ref={contentRef} className="flex-1 overflow-y-auto p-8 pr-20 relative">
+                            <SelectionTooltip
+                                containerRef={contentRef}
+                                onChatAboutSelection={handleChatAboutSelection}
+                            />
                             <div className="max-w-3xl mx-auto text-left">
                                 {/* Big Header */}
                                 <h1 className="font-medium mb-8" style={{ fontSize: '28px', color: '#232323' }}>
@@ -389,7 +428,7 @@ export default function App() {
 
                             {/* Chat Messages or Welcome */}
                             {chatStarted ? (
-                                <div className="flex-1 overflow-y-auto px-4 pt-12 pb-4">
+                                <div className="flex-1 overflow-y-auto px-8 pt-12 pb-4">
                                     <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                         {messages.map((msg) => (
                                             <ChatMessage key={msg.id} message={msg} />
@@ -427,7 +466,7 @@ export default function App() {
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {/* Chat Messages - scrollable area */}
                     {chatStarted ? (
-                        <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4">
+                        <div className="flex-1 overflow-y-auto px-8 pt-6 pb-4">
                             <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                 {messages.map((msg) => (
                                     <ChatMessage key={msg.id} message={msg} />
