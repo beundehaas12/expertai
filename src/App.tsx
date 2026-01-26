@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { X, Settings } from 'lucide-react';
+import { X, Settings, ArrowDown } from 'lucide-react';
 import { VoiceInput } from '@/components/voice';
 import { ChatMessage, TypingIndicator } from '@/components/chat';
 import { ActionBar, ExpertButton, SideModal, SelectionTooltip } from '@/components/ui';
@@ -111,18 +111,54 @@ export default function App() {
     // Ref for chat scroll container
     const chatScrollRef = useRef<HTMLDivElement>(null);
 
-    // Auto-scroll to bottom when messages change or typing starts
-    useEffect(() => {
+    // Track if user is at bottom (for smart auto-scroll) - using ref to avoid re-renders
+    const shouldAutoScrollRef = useRef(true);
+
+    // State for showing scroll-to-bottom button
+    const [showScrollButton, setShowScrollButton] = useState(false);
+
+    // Check if user is at bottom of chat
+    const handleChatScroll = useCallback(() => {
         if (chatScrollRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = chatScrollRef.current;
+            const isAtBottom = scrollHeight - scrollTop - clientHeight < 50; // 50px threshold
+            shouldAutoScrollRef.current = isAtBottom;
+            // Only update state if value changed to avoid re-renders
+            setShowScrollButton(prev => {
+                const newValue = !isAtBottom;
+                return prev !== newValue ? newValue : prev;
+            });
+        }
+    }, []);
+
+    // Auto-scroll to bottom when messages change or typing starts (only if at bottom)
+    useEffect(() => {
+        if (chatScrollRef.current && shouldAutoScrollRef.current) {
             chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
         }
     }, [messages, isTyping]);
 
-    // Scroll to bottom callback for streaming text
+    // Scroll to bottom callback for streaming text (respects user scroll)
     const scrollToBottom = useCallback(() => {
-        if (chatScrollRef.current) {
+        if (chatScrollRef.current && shouldAutoScrollRef.current) {
             chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
         }
+    }, []);
+
+    // Force scroll to bottom (for button click)
+    const scrollToBottomForced = useCallback(() => {
+        if (chatScrollRef.current) {
+            chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+            shouldAutoScrollRef.current = true;
+            setShowScrollButton(false);
+        }
+    }, []);
+
+    // Mark a message as no longer streaming
+    const markStreamComplete = useCallback((messageId: string) => {
+        setMessages(prev => prev.map(msg =>
+            msg.id === messageId ? { ...msg, isStreaming: false } : msg
+        ));
     }, []);
 
     // Handle "Chat about this" from text selection
@@ -144,19 +180,47 @@ export default function App() {
         setChatStarted(true);
         setIsTyping(true);
 
-        // Generate a long multi-paragraph response
+        // Generate a long multi-paragraph response with structure
         const topicSnippet = selectedText.slice(0, 50) + (selectedText.length > 50 ? '...' : '');
-        const longResponse = `Great question! Let me explain "${topicSnippet}" in more detail.
+        const longResponse = `# Understanding "${topicSnippet}"
 
-This concept is fundamental to understanding how our platform operates. When we talk about this topic, we're referring to a core principle that guides the way information is processed and delivered to you. The underlying technology uses advanced algorithms to ensure accuracy and relevance in every interaction.
+Great question! Let me break this down for you.
 
-From a practical standpoint, this means you can expect consistent, high-quality results whenever you engage with this feature. Our team has spent considerable time refining the approach to make sure it meets the needs of diverse users across different contexts. Whether you're looking for quick answers or in-depth analysis, the system adapts to your requirements.
+## Overview
 
-Additionally, there are several best practices we recommend when working with this aspect of the platform. First, be as specific as possible in your queries—this helps the system understand exactly what you're looking for. Second, don't hesitate to ask follow-up questions if the initial response doesn't fully address your needs. The conversational interface is designed to handle iterative refinement of your questions.
+This concept is fundamental to understanding how our platform operates. When we talk about this topic, we're referring to a core principle that guides the way information is processed and delivered to you.
 
-Finally, it's worth noting that this feature is continuously improving. We regularly incorporate user feedback and update our models to provide even better responses over time. If you have any suggestions or encounter any issues, we encourage you to let us know through the feedback mechanisms available in the application.
+The underlying technology uses advanced algorithms to ensure accuracy and relevance in every interaction.
 
-Would you like me to elaborate on any specific aspect of this topic, or do you have related questions I can help with?`;
+## Key Benefits
+
+From a practical standpoint, this means you can expect:
+
+• Consistent, high-quality results whenever you engage with this feature
+• Adaptive responses based on your specific context and needs
+• Intelligent understanding that improves with each interaction
+• Seamless integration with your existing workflow
+
+Our team has spent considerable time refining the approach to make sure it meets the needs of diverse users across different contexts.
+
+## Best Practices
+
+Here are several recommendations when working with this aspect of the platform:
+
+1. Be specific in your queries — this helps the system understand exactly what you're looking for
+2. Don't hesitate to ask follow-up questions if the initial response doesn't fully address your needs
+3. Use natural language — the conversational interface is designed to handle iterative refinement
+4. Provide context when possible — it helps generate more relevant responses
+
+## What's Next
+
+This feature is continuously improving. We regularly incorporate user feedback and update our models to provide even better responses over time.
+
+If you have any suggestions or encounter any issues, we encourage you to let us know through the feedback mechanisms available in the application.
+
+---
+
+Would you like me to elaborate on any specific aspect of this topic?`;
 
         // Simulate AI response
         setTimeout(() => {
@@ -169,7 +233,7 @@ Would you like me to elaborate on any specific aspect of this topic, or do you h
                 isStreaming: true,
             };
             setMessages(prev => [...prev, aiMessage]);
-        }, 1000);
+        }, 2500);
     }, [chatPanelOpen]);
 
     // Update body background when chat starts - instant
@@ -460,13 +524,14 @@ Would you like me to elaborate on any specific aspect of this topic, or do you h
 
                             {/* Chat Messages or Welcome */}
                             {chatStarted ? (
-                                <div ref={chatScrollRef} className="flex-1 overflow-y-auto px-8 pt-12 pb-4">
+                                <div ref={chatScrollRef} onScroll={handleChatScroll} className="flex-1 overflow-y-auto px-8 pt-12 pb-4">
                                     <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                         {messages.map((msg) => (
                                             <ChatMessage
                                                 key={msg.id}
                                                 message={msg}
                                                 onStreamUpdate={scrollToBottom}
+                                                onStreamComplete={() => markStreamComplete(msg.id)}
                                             />
                                         ))}
                                         <AnimatePresence>
@@ -488,9 +553,20 @@ Would you like me to elaborate on any specific aspect of this topic, or do you h
                                 </div>
                             )}
 
-                            {/* Input Area - fixed at bottom, not absolute */}
+                            {/* Floating scroll to bottom button */}
+                            {showScrollButton && chatStarted && (
+                                <button
+                                    onClick={scrollToBottomForced}
+                                    className="absolute left-1/2 -translate-x-1/2 bottom-24 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all hover:scale-105"
+                                    aria-label="Scroll to bottom"
+                                >
+                                    <ArrowDown size={20} className="text-gray-600" />
+                                </button>
+                            )}
+
+                            {/* Input Area - fixed at bottom */}
                             {chatStarted && (
-                                <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-4">
+                                <div className="flex-shrink-0 flex items-center justify-center px-4 pb-4">
                                     <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} />
                                 </div>
                             )}
@@ -502,13 +578,14 @@ Would you like me to elaborate on any specific aspect of this topic, or do you h
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {/* Chat Messages - scrollable area */}
                     {chatStarted ? (
-                        <div ref={chatScrollRef} className="flex-1 overflow-y-auto px-8 pt-6 pb-4">
+                        <div ref={chatScrollRef} onScroll={handleChatScroll} className="flex-1 overflow-y-auto px-8 pt-6 pb-4">
                             <div className="max-w-[600px] mx-auto flex flex-col gap-4">
                                 {messages.map((msg) => (
                                     <ChatMessage
                                         key={msg.id}
                                         message={msg}
                                         onStreamUpdate={scrollToBottom}
+                                        onStreamComplete={() => markStreamComplete(msg.id)}
                                     />
                                 ))}
                                 <AnimatePresence>
@@ -528,6 +605,17 @@ Would you like me to elaborate on any specific aspect of this topic, or do you h
                             </h1>
                             <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} />
                         </div>
+                    )}
+
+                    {/* Floating scroll to bottom button */}
+                    {showScrollButton && chatStarted && (
+                        <button
+                            onClick={scrollToBottomForced}
+                            className="absolute left-1/2 -translate-x-1/2 bottom-24 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all hover:scale-105"
+                            aria-label="Scroll to bottom"
+                        >
+                            <ArrowDown size={20} className="text-gray-600" />
+                        </button>
                     )}
 
                     {/* Input Area - fixed at bottom */}

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { FormattedText } from './FormattedText';
 
 interface StreamingTextProps {
     text: string;
@@ -18,6 +19,15 @@ export function StreamingText({
     const [displayedText, setDisplayedText] = useState('');
     const [isComplete, setIsComplete] = useState(false);
 
+    // Use refs for callbacks to avoid restarting animation when callbacks change
+    const onCompleteRef = useRef(onComplete);
+    const onUpdateRef = useRef(onUpdate);
+
+    useEffect(() => {
+        onCompleteRef.current = onComplete;
+        onUpdateRef.current = onUpdate;
+    });
+
     useEffect(() => {
         if (!text) return;
 
@@ -32,22 +42,22 @@ export function StreamingText({
                 setDisplayedText(text);
                 setIsComplete(true);
                 clearInterval(timer);
-                onComplete?.();
+                onCompleteRef.current?.();
             } else {
                 setDisplayedText(text.slice(0, currentIndex));
-                onUpdate?.();
+                onUpdateRef.current?.();
             }
         }, interval);
 
         return () => clearInterval(timer);
-    }, [text, speed, interval, onComplete, onUpdate]);
+    }, [text, speed, interval]); // Removed callback dependencies
 
     return (
-        <span>
-            {displayedText}
+        <div>
+            <FormattedText text={displayedText} />
             {!isComplete && (
                 <span className="inline-block w-2 h-4 bg-gray-400 ml-0.5 animate-pulse" />
             )}
-        </span>
+        </div>
     );
 }

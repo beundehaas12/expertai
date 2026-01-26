@@ -1,6 +1,7 @@
 import type { ChatMessage as ChatMessageType } from '@/types';
 import { MessageActions } from './MessageActions';
 import { StreamingText } from './StreamingText';
+import { FormattedText } from './FormattedText';
 
 interface ChatMessageProps {
     message: ChatMessageType;
@@ -31,8 +32,10 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
                         onComplete={onStreamComplete}
                         onUpdate={onStreamUpdate}
                     />
-                ) : (
+                ) : isUser ? (
                     message.text
+                ) : (
+                    <FormattedText text={message.text} />
                 )}
             </div>
             {!isUser && !isStreaming && <MessageActions messageId={message.id} />}
