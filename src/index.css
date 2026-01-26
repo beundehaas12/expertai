@@ -32,7 +32,7 @@
   --color-dark-text-muted: #888888;
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Fira Sans', system-ui, -apple-system, sans-serif;
 
   /* Spacing */
   --spacing-xs: 4px;

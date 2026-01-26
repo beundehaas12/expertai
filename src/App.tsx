@@ -192,8 +192,133 @@ export default function App() {
                         }}
                     >
                         {/* Main Content */}
-                        <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto">
-                            <div className="text-gray-400 text-lg">Content Area</div>
+                        <div className="flex-1 overflow-y-auto p-8 pr-20">
+                            <div className="max-w-3xl text-left">
+                                {/* Big Header */}
+                                <h1 className="font-medium mb-8" style={{ fontSize: '28px', color: '#232323' }}>
+                                    Welcome to Expert AI
+                                </h1>
+
+                                {/* Section 1 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Getting Started
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Expert AI is your intelligent assistant designed to help you navigate complex tasks with ease. Whether you're looking for quick answers, detailed explanations, or creative solutions, our AI-powered platform adapts to your needs and delivers personalized responses in real-time.
+                                </p>
+
+                                {/* Section 2 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Key Features
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Our platform offers a seamless experience with voice input capabilities, intelligent context understanding, and multi-modal interactions. The intuitive interface allows you to switch between text and voice effortlessly, making communication natural and efficient.
+                                </p>
+
+                                {/* Section 3 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    How It Works
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Simply click on the Expert AI button or use the chat panel to start a conversation. You can type your questions or use voice input for hands-free interaction. The AI processes your queries instantly and provides comprehensive, accurate responses tailored to your context.
+                                </p>
+
+                                {/* Section 4 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Best Practices
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    For optimal results, be specific with your questions and provide context when needed. The more details you share, the better the AI can understand and assist you. Don't hesitate to ask follow-up questions or request clarifications—the system is designed to handle multi-turn conversations naturally.
+                                </p>
+
+                                {/* Section 5 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Privacy & Security
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Your data security is our top priority. All conversations are encrypted and processed with strict privacy protocols. We never share your personal information with third parties, and you have full control over your conversation history and data preferences.
+                                </p>
+
+                                {/* Section 6 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Advanced Capabilities
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                </p>
+
+                                {/* Section 7 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Integration Options
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra.
+                                </p>
+
+                                {/* Section 8 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Customization Settings
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat.
+                                </p>
+
+                                {/* Section 9 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Performance Metrics
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. Phasellus ultrices nulla quis nibh. Quisque a lectus. Donec consectetuer ligula vulputate sem tristique cursus. Nam nulla quam, gravida non, commodo a, sodales sit amet, nisi. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+                                </p>
+
+                                {/* Section 10 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    User Feedback
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Curabitur sit amet mauris. Morbi in dui quis est pulvinar ullamcorper. Nulla facilisi. Integer lacinia sollicitudin massa. Cras metus. Sed aliquet risus a tortor. Integer id quam. Morbi mi. Quisque nisl felis, venenatis tristique, dignissim in, ultrices sit amet, augue. Proin sodales libero eget ante.
+                                </p>
+
+                                {/* Section 11 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Troubleshooting Guide
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Nullam egestas, nisl id faucibus vulputate, nulla nisl tincidunt velit, a aliquam nibh arcu eu nisi. Proin dignissim tempor orci. Nullam ornare. Praesent odio ligula, dapibus sed, tincidunt eget, elementum nec, orci. Praesent in mauris eu tortor porttitor accumsan. Mauris suscipit, ligula sit amet pharetra semper, nibh ante cursus purus.
+                                </p>
+
+                                {/* Section 12 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Technical Specifications
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Fusce suscipit, wisi nec facilisis facilisis, est dui fermentum leo, quis tempor ligula erat quis odio. Nunc porta vulputate tellus. Nunc rutrum turpis sed pede. Sed bibendum. Aliquam posuere. Nunc aliquet, augue nec adipiscing interdum, lacus tellus malesuada massa, quis varius mi purus non odio.
+                                </p>
+
+                                {/* Section 13 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    API Documentation
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Pellentesque condimentum, magna ut suscipit hendrerit, ipsum augue ornare nulla, non luctus diam neque sit amet urna. Curabitur vulputate vestibulum lorem. Fusce sagittis, libero non molestie mollis, magna orci ultrices dolor, at vulputate neque nulla lacinia eros. Sed id ligula quis est convallis tempor.
+                                </p>
+
+                                {/* Section 14 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Roadmap & Updates
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Integer nunc. Vivamus bibendum, nulla ut congue fringilla, lorem ipsum ultricies risus, ut rutrum velit tortor vel purus. In hac habitasse platea dictumst. Morbi vestibulum volutpat enim. Nunc interdum lacus sit amet orci. Vestibulum rutrum, mi nec elementum vehicula, eros quam gravida nisl, id fringilla neque ante vel mi.
+                                </p>
+
+                                {/* Section 15 */}
+                                <h2 className="text-base font-medium mb-4" style={{ color: '#232323' }}>
+                                    Contact & Support
+                                </h2>
+                                <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
+                                    Duis sapien sem, aliquet sed, consequat eget, convallis quis, turpis. Suspendisse sed velit vel urna cursus ultricies. Proin laoreet libero lacinia erat congue, sed accumsan sem vestibulum eu. Etiam at risus et justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet.
+                                </p>
+                            </div>
                         </div>
 
                         {/* Floating Button - lower right corner */}
