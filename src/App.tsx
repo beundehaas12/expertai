@@ -199,7 +199,7 @@ export default function App() {
                         {/* Floating Button - lower right corner */}
                         {buttonPosition === 'floating' && (
                             <div className="absolute bottom-6 right-6 z-20">
-                                <ExpertButton label="Ask Expert AI" onClick={() => setChatPanelOpen(true)} />
+                                <ExpertButton label="Ask Expert AI" onClick={() => setChatPanelOpen(true)} className="shadow-lg" />
                             </div>
                         )}
 
@@ -216,7 +216,7 @@ export default function App() {
                     {/* Drag Handle - only show when chat panel is open */}
                     {chatPanelOpen && (
                         <div
-                            className="w-1 bg-gray-200 hover:bg-blue-400 cursor-col-resize transition-colors relative group flex-shrink-0"
+                            className="w-px hover:w-0.5 bg-[#DADADA] hover:bg-blue-400 cursor-col-resize transition-all relative group flex-shrink-0 z-30"
                             onMouseDown={(e) => {
                                 e.preventDefault();
                                 const startX = e.clientX;
@@ -237,7 +237,7 @@ export default function App() {
                                 document.addEventListener('mouseup', handleMouseUp);
                             }}
                         >
-                            <div className="absolute inset-y-0 -left-1 -right-1 group-hover:bg-blue-400/20" />
+                            <div className="absolute inset-y-0 -left-0.5 -right-0.5 group-hover:bg-blue-400/20 z-30" />
                         </div>
                     )}
 
