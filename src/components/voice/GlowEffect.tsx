@@ -39,7 +39,7 @@ export const GlowEffect = memo(function GlowEffect({ intensity, isActive, contai
         <>
             {/* Glow pseudo-element */}
             <div
-                className="absolute -inset-2 rounded-[35px] -z-10"
+                className="absolute inset-0 rounded-[28px] z-0"
                 style={{
                     background: `conic-gradient(from 0deg,
             #F29097 5%,
@@ -53,13 +53,13 @@ export const GlowEffect = memo(function GlowEffect({ intensity, isActive, contai
             #80BDE1 95%,
             #F29097 100%
           )`,
-                    filter: 'blur(12px)',
+                    filter: `blur(${16 + glowOpacity * 8}px)`,
                     opacity: glowOpacity,
                     transition: 'opacity 0.1s ease-out',
                 }}
             />
             {/* Inner white background to mask gradient behind content */}
-            <div className="absolute inset-0 bg-white rounded-[28px] z-0" />
+            <div className="absolute inset-0 bg-white rounded-[28px] z-[1]" />
         </>
     );
 });

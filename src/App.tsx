@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { X, Settings } from 'lucide-react';
-import { VoiceInput, IntelligenceEffect } from '@/components/voice';
+import { VoiceInput } from '@/components/voice';
 import { ChatMessage, TypingIndicator } from '@/components/chat';
 import { ActionBar, ExpertButton, SideModal } from '@/components/ui';
 import type { ChatMessage as ChatMessageType, VoiceVariant } from '@/types';
@@ -208,13 +208,12 @@ export default function App() {
                     {/* Right Panel - Chat - only show when open */}
                     {chatPanelOpen && (
                         <div
-                            className="flex flex-col relative"
+                            className="flex flex-col relative overflow-hidden"
                             style={{
                                 width: `${splitWidth}%`,
                                 backgroundImage: chatStarted ? 'none' : "url('./img/background.jpg')",
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
-                                backgroundColor: chatStarted ? 'white' : undefined,
                             }}
                         >
                             {/* Close Button - Top Right */}
@@ -226,11 +225,6 @@ export default function App() {
                             >
                                 <X size={18} className="text-gray-500" />
                             </button>
-
-                            {/* Intelligence Effect for split view - rendered at panel level */}
-                            {voiceVariant === 'intelligence' && isVoiceActive && (
-                                <IntelligenceEffect isActive={true} intensity={voiceIntensity} contained={true} />
-                            )}
 
                             {/* Chat Messages or Welcome */}
                             {chatStarted ? (
@@ -245,7 +239,7 @@ export default function App() {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex-1 flex flex-col items-center justify-center px-4 overflow-visible">
+                                <div className="flex-1 flex flex-col items-center justify-center">
                                     <img
                                         src="./img/expert-ai-spark.svg"
                                         alt=""
@@ -254,14 +248,14 @@ export default function App() {
                                     <h1 className="text-3xl font-medium text-gray-900 text-center mb-10">
                                         How can I help you?
                                     </h1>
-                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} splitView={true} onVoiceStateChange={handleVoiceStateChange} />
+                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} />
                                 </div>
                             )}
 
                             {/* Input Area - fixed at bottom, not absolute */}
                             {chatStarted && (
-                                <div className="flex-shrink-0 bg-white h-[72px] flex items-start justify-center px-4 overflow-visible">
-                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} splitView={true} onVoiceStateChange={handleVoiceStateChange} />
+                                <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-4">
+                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} />
                                 </div>
                             )}
                         </div>
@@ -298,7 +292,7 @@ export default function App() {
 
                     {/* Input Area - fixed at bottom */}
                     {chatStarted && (
-                        <div className="flex-shrink-0 bg-white h-[72px] flex items-start justify-center px-4">
+                        <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-4">
                             <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} />
                         </div>
                     )}
