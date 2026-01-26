@@ -22,6 +22,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
     const [visualizerData, setVisualizerData] = useState<Uint8Array>(new Uint8Array(100).fill(0));
     const [volume, setVolume] = useState(0);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [micError, setMicError] = useState<string | null>(null);
 
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -105,8 +106,14 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
         } catch (err) {
             console.error('Error accessing microphone:', err);
             const errorMessage = err instanceof Error ? err.message : String(err);
-            alert(`Microphone error: ${errorMessage}`);
+            // Show subtle inline error instead of native alert
+            setMicError(errorMessage === 'Invalid constraint'
+                ? 'No microphone detected'
+                : `Microphone unavailable: ${errorMessage}`
+            );
             setMode('text');
+            // Auto-clear error after 4 seconds
+            setTimeout(() => setMicError(null), 4000);
         }
     };
 
@@ -256,6 +263,22 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
         ${isVoiceMode && isGlowVariant ? 'shadow-lg' : ''}
       `}
         >
+            {/* Microphone Error Toast */}
+            <AnimatePresence>
+                {micError && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                        className="absolute -top-14 left-1/2 -translate-x-1/2 z-50"
+                    >
+                        <div className="bg-gray-900 text-white text-sm px-4 py-2 rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap">
+                            <Mic size={14} className="text-red-400" />
+                            <span>{micError}</span>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {/* Glow Effect for glow variant */}
             {isGlowVariant && (
                 <GlowEffect intensity={glowIntensity} isActive={isVoiceMode} />
