@@ -3,7 +3,7 @@ import { memo } from 'react';
 interface IntelligenceEffectProps {
   isActive: boolean;
   intensity?: number; // 0-1 based on voice volume
-  contained?: boolean; // If true, use absolute positioning within parent
+  contained?: boolean; // If true, use contained styling for previews
 }
 
 export const IntelligenceEffect = memo(function IntelligenceEffect({
@@ -15,13 +15,48 @@ export const IntelligenceEffect = memo(function IntelligenceEffect({
 
   // Scale opacity and blur based on voice intensity
   const baseOpacity = 0.4 + intensity * 0.6; // 0.4 to 1.0
-  const positionClass = contained ? 'absolute' : 'fixed';
 
+  // Contained mode - simpler gradient border for previews
+  if (contained) {
+    return (
+      <>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '28px',
+            background: `conic-gradient(
+              from var(--angle, 0deg),
+              #F29097, #E5202E, #F29097,
+              #C2DE90, #85BC20, #C2DE90,
+              #80BDE1, #007AC3, #80BDE1, #F29097
+            )`,
+            filter: 'blur(8px)',
+            opacity: baseOpacity,
+            animation: 'intelligence-spin 5000ms infinite linear',
+            zIndex: 0,
+          }}
+        />
+        <style>{`
+          @property --angle {
+            inherits: false;
+            initial-value: 0deg;
+            syntax: "<angle>";
+          }
+          @keyframes intelligence-spin {
+            to { --angle: 360deg; }
+          }
+        `}</style>
+      </>
+    );
+  }
+
+  // Full-screen mode (original behavior)
   return (
     <>
       {/* Small glow layer */}
       <div
-        className={`${positionClass} inset-0 pointer-events-none z-[9999]`}
+        className="fixed inset-0 pointer-events-none z-[9999]"
         style={{
           borderStyle: 'solid',
           borderWidth: `${9 + intensity * 5}px`,
@@ -47,7 +82,7 @@ export const IntelligenceEffect = memo(function IntelligenceEffect({
       />
       {/* Medium glow layer */}
       <div
-        className={`${positionClass} inset-0 pointer-events-none z-[9998]`}
+        className="fixed inset-0 pointer-events-none z-[9998]"
         style={{
           borderStyle: 'solid',
           borderWidth: `${17 + intensity * 8}px`,
@@ -73,7 +108,7 @@ export const IntelligenceEffect = memo(function IntelligenceEffect({
       />
       {/* Large glow layer */}
       <div
-        className={`${positionClass} inset-0 pointer-events-none z-[9997]`}
+        className="fixed inset-0 pointer-events-none z-[9997]"
         style={{
           borderStyle: 'solid',
           borderWidth: `${30 + intensity * 15}px`,

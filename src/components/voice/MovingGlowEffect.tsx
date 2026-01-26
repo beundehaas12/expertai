@@ -2,9 +2,10 @@ import { memo, useState, useEffect } from 'react';
 
 interface MovingGlowEffectProps {
     isActive: boolean;
+    contained?: boolean; // If true, use contained positioning for previews
 }
 
-export const MovingGlowEffect = memo(function MovingGlowEffect({ isActive }: MovingGlowEffectProps) {
+export const MovingGlowEffect = memo(function MovingGlowEffect({ isActive, contained = false }: MovingGlowEffectProps) {
     const [arcScale, setArcScale] = useState(1);
 
     // Animate the gradient arc scale
@@ -27,6 +28,44 @@ export const MovingGlowEffect = memo(function MovingGlowEffect({ isActive }: Mov
         animationId = requestAnimationFrame(animate);
         return () => cancelAnimationFrame(animationId);
     }, [isActive]);
+
+    if (contained) {
+        // Contained mode for settings preview
+        return (
+            <>
+                {isActive && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            borderRadius: '28px',
+                            background: `conic-gradient(from 0deg,
+                                rgba(0, 0, 0, 0) 0%,
+                                #E5202E ${6 * arcScale}%,
+                                #F29097 ${12 * arcScale}%,
+                                #85BC20 ${18 * arcScale}%,
+                                #85BC20 ${28 * arcScale}%,
+                                #C2DE90 ${34 * arcScale}%,
+                                #007AC3 ${40 * arcScale}%,
+                                #80BDE1 ${46 * arcScale}%,
+                                rgba(0, 0, 0, 0) ${52 * arcScale}%
+                            )`,
+                            filter: 'blur(8px)',
+                            opacity: 0.8,
+                            animation: 'moving-glow-spin 4s linear infinite',
+                            zIndex: 0,
+                        }}
+                    />
+                )}
+                <style>{`
+                    @keyframes moving-glow-spin {
+                        from { transform: rotate(0deg); }
+                        to { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </>
+        );
+    }
 
     return (
         <>
