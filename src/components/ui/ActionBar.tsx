@@ -69,7 +69,7 @@ export function ActionBar({ onNewChat, onStartChat, showExpertButton = true }: A
             {showExpertButton && (
                 <div className="relative" ref={dropdownRef}>
                     <div onClick={() => setShowDropdown(!showDropdown)}>
-                        <ExpertButton />
+                        <ExpertButton isActive={showDropdown} />
                     </div>
 
                     {/* Dropdown Menu */}

@@ -5,9 +5,10 @@ interface ExpertButtonProps {
     onClick?: () => void;
     disabled?: boolean;
     className?: string;
+    isActive?: boolean;
 }
 
-export function ExpertButton({ label, onClick, disabled, className = '' }: ExpertButtonProps) {
+export function ExpertButton({ label, onClick, disabled, className = '', isActive = false }: ExpertButtonProps) {
     const hasLabel = Boolean(label);
     const [isHovered, setIsHovered] = useState(false);
 
@@ -26,6 +27,9 @@ export function ExpertButton({ label, onClick, disabled, className = '' }: Exper
         #F29097 100%
     )`;
 
+    // Show gradient border on hover OR when active
+    const showBorder = (isHovered || isActive) && !disabled;
+
     return (
         <div
             className="relative inline-flex"
@@ -41,7 +45,7 @@ export function ExpertButton({ label, onClick, disabled, className = '' }: Exper
                     right: '-1.5px',
                     bottom: '-1.5px',
                     background: gradientBorder,
-                    opacity: isHovered && !disabled ? 1 : 0,
+                    opacity: showBorder ? 1 : 0,
                     zIndex: 0,
                 }}
             />
@@ -53,10 +57,11 @@ export function ExpertButton({ label, onClick, disabled, className = '' }: Exper
                     relative z-10
                     group
                     inline-flex items-center justify-center gap-2
-                    bg-black rounded-full
+                    rounded-full
                     transition-all duration-200
                     disabled:opacity-50 disabled:cursor-not-allowed
                     ${hasLabel ? 'px-[10px] h-8' : 'w-8 h-8'}
+                    ${isActive ? 'bg-white' : 'bg-black'}
                     ${className}
                 `}
                 style={{
@@ -66,11 +71,15 @@ export function ExpertButton({ label, onClick, disabled, className = '' }: Exper
                 <img
                     src="/img/expert-ai-spark-button.svg"
                     alt=""
-                    className={`${hasLabel ? 'w-4 h-4' : 'w-5 h-5'} transition-all duration-200 group-hover:brightness-0 group-hover:invert`}
+                    className={`
+                        ${hasLabel ? 'w-4 h-4' : 'w-5 h-5'} 
+                        transition-all duration-200
+                        ${isActive ? 'brightness-0' : 'group-hover:brightness-0 group-hover:invert'}
+                    `}
                 />
                 {hasLabel && (
                     <span
-                        className="text-white font-normal"
+                        className={`font-normal ${isActive ? 'text-black' : 'text-white'}`}
                         style={{
                             fontSize: '14px',
                             lineHeight: '15.8px',
@@ -83,3 +92,4 @@ export function ExpertButton({ label, onClick, disabled, className = '' }: Exper
         </div>
     );
 }
+
