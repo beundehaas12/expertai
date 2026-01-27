@@ -467,8 +467,8 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                             <textarea
                                 ref={inputRef}
                                 rows={1}
-                                className="flex-1 min-w-0 bg-transparent border-none outline-none text-base text-gray-900 font-normal resize-none overflow-y-auto placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden"
-                                style={{ height: '40px', maxHeight: '200px', lineHeight: '24px', paddingTop: '8px', paddingBottom: '8px' }}
+                                className="flex-1 min-w-0 border-none outline-none text-base text-gray-900 font-normal resize-none overflow-y-auto placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden"
+                                style={{ height: '40px', maxHeight: '200px', lineHeight: '24px', paddingTop: '8px', paddingBottom: '8px', background: 'transparent' }}
                                 placeholder={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? "Listening..." : "How can Expert AI help?"}
                                 value={displayValue}
                                 onChange={handleTextChange}
