@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface ExpertButtonProps {
     label?: string;
     onClick?: () => void;
@@ -7,40 +9,77 @@ interface ExpertButtonProps {
 
 export function ExpertButton({ label, onClick, disabled, className = '' }: ExpertButtonProps) {
     const hasLabel = Boolean(label);
+    const [isHovered, setIsHovered] = useState(false);
+
+    // Expert AI gradient: angular gradient with pink/red, blue, green color stops
+    const gradientBorder = `conic-gradient(
+        from 0deg,
+        #F29097 5%,
+        #E5202E 15%,
+        #F29097 30%,
+        #80BDE1 40%,
+        #007AC3 50%,
+        #80BDE1 60%,
+        #C2DE90 70%,
+        #85BC20 85%,
+        #C2DE90 95%,
+        #F29097 100%
+    )`;
 
     return (
-        <button
-            onClick={onClick}
-            disabled={disabled}
-            className={`
-                group
-                inline-flex items-center justify-center gap-2
-                bg-black rounded-lg
-                transition-all duration-200
-                disabled:opacity-50 disabled:cursor-not-allowed
-                ${hasLabel ? 'px-[10px] h-8' : 'w-8 h-8'}
-                ${className}
-            `}
-            style={{
-                fontFamily: "'Fira Sans', sans-serif",
-            }}
+        <div
+            className="relative inline-flex"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
-            <img
-                src="/img/expert-ai-spark-button.svg"
-                alt=""
-                className={`${hasLabel ? 'w-4 h-4' : 'w-5 h-5'} transition-all duration-200 group-hover:brightness-0 group-hover:invert`}
+            {/* Gradient border (1.5px outside) */}
+            <div
+                className="absolute rounded-full transition-opacity duration-200"
+                style={{
+                    top: '-1.5px',
+                    left: '-1.5px',
+                    right: '-1.5px',
+                    bottom: '-1.5px',
+                    background: gradientBorder,
+                    opacity: isHovered && !disabled ? 1 : 0,
+                    zIndex: 0,
+                }}
             />
-            {hasLabel && (
-                <span
-                    className="text-white font-normal"
-                    style={{
-                        fontSize: '14px',
-                        lineHeight: '15.8px',
-                    }}
-                >
-                    {label}
-                </span>
-            )}
-        </button>
+
+            <button
+                onClick={onClick}
+                disabled={disabled}
+                className={`
+                    relative z-10
+                    group
+                    inline-flex items-center justify-center gap-2
+                    bg-black rounded-full
+                    transition-all duration-200
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                    ${hasLabel ? 'px-[10px] h-8' : 'w-8 h-8'}
+                    ${className}
+                `}
+                style={{
+                    fontFamily: "'Fira Sans', sans-serif",
+                }}
+            >
+                <img
+                    src="/img/expert-ai-spark-button.svg"
+                    alt=""
+                    className={`${hasLabel ? 'w-4 h-4' : 'w-5 h-5'} transition-all duration-200 group-hover:brightness-0 group-hover:invert`}
+                />
+                {hasLabel && (
+                    <span
+                        className="text-white font-normal"
+                        style={{
+                            fontSize: '14px',
+                            lineHeight: '15.8px',
+                        }}
+                    >
+                        {label}
+                    </span>
+                )}
+            </button>
+        </div>
     );
 }
