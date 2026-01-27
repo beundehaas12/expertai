@@ -381,7 +381,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
             />
 
             {/* Main Content - Column layout with attachments above input */}
-            <div className="relative z-10 flex flex-col w-full gap-2">
+            <div className="relative z-20 flex flex-col w-full gap-2">
                 {/* Image Preview Section */}
                 {attachedImages.length > 0 && (
                     <div className="flex flex-wrap gap-2 px-2 pt-2">
