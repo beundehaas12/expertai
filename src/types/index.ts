@@ -5,7 +5,7 @@ export type VoiceVariant = 'waveform' | 'glow' | 'moving-glow' | 'intelligence';
 export type ButtonPosition = 'none' | 'header' | 'actionbar' | 'floating';
 
 // Chat message types
-export type MessageSender = 'user' | 'ai';
+export type MessageSender = 'user' | 'ai' | 'system';
 
 export interface ChatMessage {
     id: string;
@@ -13,6 +13,8 @@ export interface ChatMessage {
     sender: MessageSender;
     timestamp: number;
     isStreaming?: boolean;
+    isCancelled?: boolean;
+    isSystemNotice?: boolean;
 }
 
 // Voice input state

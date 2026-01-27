@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, ArrowUp, Plus, X, Check, Image, FileText } from 'lucide-react';
+import { Mic, ArrowUp, Plus, X, Check, Image, FileText, Square } from 'lucide-react';
 import { Waveform } from './Waveform';
 import { GlowEffect } from './GlowEffect';
 import { MovingGlowEffect } from './MovingGlowEffect';
@@ -13,16 +13,19 @@ interface VoiceInputProps {
     dropdownAbove?: boolean;
     splitView?: boolean;
     onVoiceStateChange?: (isVoiceMode: boolean, intensity: number) => void;
+    isAiBusy?: boolean;
+    onStop?: () => void;
 }
 
-export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false, splitView = false, onVoiceStateChange }: VoiceInputProps) {
+export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false, splitView = false, onVoiceStateChange, isAiBusy = false, onStop }: VoiceInputProps) {
     const [mode, setMode] = useState<VoiceInputMode>('text');
     const [textValue, setTextValue] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
     const [visualizerData, setVisualizerData] = useState<Uint8Array>(new Uint8Array(100).fill(0));
     const [volume, setVolume] = useState(0);
     const [showDropdown, setShowDropdown] = useState(false);
-    const [micError, setMicError] = useState<string | null>(null);
+    const [micAvailable, setMicAvailable] = useState<boolean | null>(null); // null = checking, true = available, false = unavailable
+    const [showMicTooltip, setShowMicTooltip] = useState(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -32,6 +35,41 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
     const streamRef = useRef<MediaStream | null>(null);
     const rafRef = useRef<number | null>(null);
     const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+    const micCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    // Check microphone availability
+    const checkMicrophoneAvailability = useCallback(async () => {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const hasAudioInput = devices.some(device => device.kind === 'audioinput');
+            setMicAvailable(hasAudioInput);
+            return hasAudioInput;
+        } catch {
+            setMicAvailable(false);
+            return false;
+        }
+    }, []);
+
+    // Check microphone on mount and periodically
+    useEffect(() => {
+        checkMicrophoneAvailability();
+
+        // Listen for device changes (microphone plugged in/out)
+        const handleDeviceChange = () => {
+            checkMicrophoneAvailability();
+        };
+        navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
+
+        // Also check periodically as a fallback (every 3 seconds)
+        micCheckIntervalRef.current = setInterval(checkMicrophoneAvailability, 3000);
+
+        return () => {
+            navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange);
+            if (micCheckIntervalRef.current) {
+                clearInterval(micCheckIntervalRef.current);
+            }
+        };
+    }, [checkMicrophoneAvailability]);
 
     // Auto-focus input when switching to text mode
     useEffect(() => {
@@ -103,17 +141,13 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
 
             // Start speech recognition
             startSpeechRecognition();
+
+            // Mark mic as available since we got a stream
+            setMicAvailable(true);
         } catch (err) {
             console.error('Error accessing microphone:', err);
-            const errorMessage = err instanceof Error ? err.message : String(err);
-            // Show subtle inline error instead of native alert
-            setMicError(errorMessage === 'Invalid constraint'
-                ? 'No microphone detected'
-                : `Microphone unavailable: ${errorMessage}`
-            );
+            setMicAvailable(false);
             setMode('text');
-            // Auto-clear error after 4 seconds
-            setTimeout(() => setMicError(null), 4000);
         }
     };
 
@@ -236,9 +270,12 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            handleSend();
+            // Can only send if AI is not busy
+            if (!isAiBusy) {
+                handleSend();
+            }
         }
-    }, [handleSend]);
+    }, [handleSend, isAiBusy]);
 
     const displayValue = mode === 'voice' && interimTranscript
         ? textValue + (textValue ? ' ' : '') + interimTranscript
@@ -263,22 +300,6 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
         ${isVoiceMode && isGlowVariant ? 'shadow-lg' : ''}
       `}
         >
-            {/* Microphone Error Toast */}
-            <AnimatePresence>
-                {micError && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                        className="absolute -top-14 left-1/2 -translate-x-1/2 z-50"
-                    >
-                        <div className="bg-gray-900 text-white text-sm px-4 py-2 rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap">
-                            <Mic size={14} className="text-red-400" />
-                            <span>{micError}</span>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
             {/* Glow Effect for glow variant */}
             {isGlowVariant && (
                 <GlowEffect intensity={glowIntensity} isActive={isVoiceMode} />
@@ -310,7 +331,8 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+                                    className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                                    style={{ color: '#232323' }}
                                     aria-label="Add attachment"
                                     onClick={() => setShowDropdown(!showDropdown)}
                                 >
@@ -346,45 +368,89 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                             <input
                                 ref={inputRef}
                                 type="text"
-                                className="flex-1 min-w-0 h-full bg-transparent border-none outline-none text-base text-gray-900 font-light placeholder:text-gray-400 placeholder:font-extralight text-ellipsis"
+                                className="flex-1 min-w-0 h-full bg-transparent border-none outline-none text-base text-gray-900 font-normal text-ellipsis"
                                 placeholder={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? "Listening..." : "How can Expert AI help?"}
                                 value={displayValue}
                                 onChange={handleTextChange}
                                 onKeyDown={handleKeyDown}
                             />
 
-                            {/* Mic Button */}
+                            {/* Mic Button with Tooltip */}
+                            <div
+                                className="relative"
+                                onMouseEnter={() => micAvailable === false && setShowMicTooltip(true)}
+                                onMouseLeave={() => setShowMicTooltip(false)}
+                            >
+                                <motion.button
+                                    whileHover={micAvailable !== false ? { scale: 1.05 } : {}}
+                                    whileTap={micAvailable !== false ? { scale: 0.95 } : {}}
+                                    className={`
+                                        flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full
+                                        transition-colors duration-200
+                                        ${micAvailable === false
+                                            ? 'text-gray-300 cursor-not-allowed'
+                                            : isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant)
+                                                ? 'text-blue-500'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }
+                                    `}
+                                    onClick={micAvailable === false ? undefined : (isVoiceMode ? handleConfirm : handleMicClick)}
+                                    disabled={micAvailable === false}
+                                    aria-label={micAvailable === false ? "No microphone detected" : isVoiceMode ? "Stop Listening" : "Use Microphone"}
+                                >
+                                    <Mic size={24} />
+                                </motion.button>
+
+                                {/* Tooltip for disabled mic - matches SelectionTooltip style */}
+                                <AnimatePresence>
+                                    {showMicTooltip && micAvailable === false && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 5 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50"
+                                        >
+                                            <div
+                                                className="text-white font-normal shadow-lg whitespace-nowrap px-2 flex items-center"
+                                                style={{ backgroundColor: '#232323', fontSize: '12px', height: '24px', borderRadius: 0 }}
+                                            >
+                                                No microphone detected
+                                            </div>
+                                            {/* Arrow pointing down */}
+                                            <div
+                                                className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0"
+                                                style={{
+                                                    borderLeft: '4px solid transparent',
+                                                    borderRight: '4px solid transparent',
+                                                    borderTop: '4px solid #232323',
+                                                }}
+                                            />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            {/* Send/Stop Button */}
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 className={`
-                  flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full
-                  transition-colors duration-200
-                  ${isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? 'text-blue-500' : 'text-gray-700 hover:bg-gray-100'}
-                `}
-                                onClick={isVoiceMode ? handleConfirm : handleMicClick}
-                                aria-label={isVoiceMode ? "Stop Listening" : "Use Microphone"}
-                            >
-                                <Mic size={24} />
-                            </motion.button>
-
-                            {/* Send Button */}
-                            <motion.button
-                                whileHover={hasContent ? { scale: 1.05 } : {}}
-                                whileTap={hasContent ? { scale: 0.95 } : {}}
-                                className={`
-                  flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full
-                  transition-all duration-200
-                  ${hasContent
+                                    flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full
+                                    transition-all duration-200
+                                    ${isAiBusy
                                         ? 'bg-gray-900 text-white cursor-pointer hover:bg-gray-700'
-                                        : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                        : hasContent
+                                            ? 'bg-gray-900 text-white cursor-pointer hover:bg-gray-700'
+                                            : 'text-white cursor-not-allowed'
                                     }
-                `}
-                                onClick={handleSend}
-                                disabled={!hasContent}
-                                aria-label="Send"
+                                `}
+                                style={!isAiBusy && !hasContent ? { backgroundColor: 'rgba(0, 0, 0, 0.35)' } : undefined}
+                                onClick={isAiBusy ? onStop : handleSend}
+                                disabled={!isAiBusy && !hasContent}
+                                aria-label={isAiBusy ? "Stop generation" : "Send"}
                             >
-                                <ArrowUp size={20} />
+                                {isAiBusy ? <Square size={16} fill="currentColor" /> : <ArrowUp size={20} />}
                             </motion.button>
                         </motion.div>
                     ) : (

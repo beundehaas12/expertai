@@ -135,8 +135,12 @@ export default function App() {
     // - 'streaming': Currently printing text (ChatMessage is active)
     const [aiStatus, setAiStatus] = useState<'idle' | 'thinking' | 'streaming'>('idle');
 
+    // Ref to track current AI processing timeout (for cancellation)
+    const aiProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
     // Derived state for existing components using boolean flags
     const isTyping = aiStatus === 'thinking';
+    const isAiBusy = aiStatus !== 'idle';
 
     const [voiceVariant, setVoiceVariant] = useState<VoiceVariant>('glow');
     const [splitView, setSplitView] = useState(() => {
@@ -228,8 +232,10 @@ export default function App() {
                 setMessages(prev => [...prev, currentRequest.userMessage!]);
             }
 
-            // Simulate Thinking Delay
-            setTimeout(() => {
+            // Simulate Thinking Delay - store timeout ID for cancellation
+            aiProcessingTimeoutRef.current = setTimeout(() => {
+                aiProcessingTimeoutRef.current = null;
+
                 // Determine response type based on request
                 let responseText = getSimulatedResponse();
                 if (currentRequest.type === 'selection') {
@@ -253,6 +259,46 @@ export default function App() {
             }, getRandomDelay());
         }
     }, [aiStatus, pendingQueue]);
+
+    // STOP GENERATION HANDLER
+    const handleStopGeneration = useCallback(() => {
+        // Clear any pending timeout (for 'thinking' phase)
+        if (aiProcessingTimeoutRef.current) {
+            clearTimeout(aiProcessingTimeoutRef.current);
+            aiProcessingTimeoutRef.current = null;
+        }
+
+        // Clear the pending queue
+        setPendingQueue([]);
+
+        // If currently streaming, mark the last AI message as cancelled
+        if (aiStatus === 'streaming') {
+            setMessages(prev => {
+                const lastAiIndex = prev.map(m => m.sender).lastIndexOf('ai');
+                if (lastAiIndex >= 0) {
+                    return prev.map((msg, i) =>
+                        i === lastAiIndex
+                            ? { ...msg, isStreaming: false, isCancelled: true }
+                            : msg
+                    );
+                }
+                return prev;
+            });
+        }
+
+        // Add cancelled notice message
+        const cancelledMessage: ChatMessageType = {
+            id: generateId(),
+            text: '_Operation cancelled by user_',
+            sender: 'system',
+            timestamp: Date.now(),
+            isSystemNotice: true,
+        };
+        setMessages(prev => [...prev, cancelledMessage]);
+
+        // Reset to idle
+        setAiStatus('idle');
+    }, [aiStatus]);
 
     // 3. STREAM COMPLETION HANDLER
     // Called by ChatMessage when typewriting ends
@@ -744,7 +790,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                     <h1 className="text-3xl font-medium text-gray-900 text-center mb-10">
                                         How can I help you?
                                     </h1>
-                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} />
+                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} />
                                 </div>
                             )}
 
@@ -762,7 +808,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             {/* Input Area - fixed at bottom */}
                             {chatStarted && (
                                 <div className="flex-shrink-0 flex items-center justify-center px-4 pb-4">
-                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} />
+                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} />
                                 </div>
                             )}
                         </div>
@@ -802,7 +848,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             <h1 className="text-3xl font-medium text-gray-900 text-center mb-10">
                                 How can I help you?
                             </h1>
-                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} />
+                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} />
                         </div>
                     )}
 
@@ -820,7 +866,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                     {/* Input Area - fixed at bottom */}
                     {chatStarted && (
                         <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-4">
-                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} />
+                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} />
                         </div>
                     )}
                 </div>

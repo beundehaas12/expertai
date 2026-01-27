@@ -11,7 +11,19 @@ interface ChatMessageProps {
 
 export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatMessageProps) {
     const isUser = message.sender === 'user';
-    const isStreaming = message.isStreaming && !isUser;
+    const isSystem = message.sender === 'system';
+    const isStreaming = message.isStreaming && !isUser && !isSystem;
+
+    // System notice (e.g., "Operation cancelled by user") - left aligned
+    if (isSystem && message.isSystemNotice) {
+        return (
+            <div className="w-full py-2 self-start text-left">
+                <span className="text-sm text-gray-400 italic">
+                    {message.text.replace(/_/g, '')}
+                </span>
+            </div>
+        );
+    }
 
     return (
         <div className={`max-w-[80%] ${isUser ? 'self-end' : 'self-start'}`}>
@@ -38,7 +50,8 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
                     <FormattedText text={message.text} />
                 )}
             </div>
-            {!isUser && !isStreaming && <MessageActions messageId={message.id} />}
+            {/* Show action items for AI messages that are not streaming and have content */}
+            {!isUser && !isStreaming && message.text.trim().length > 0 && <MessageActions messageId={message.id} />}
         </div>
     );
 }
