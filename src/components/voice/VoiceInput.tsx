@@ -26,8 +26,9 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
     const [showDropdown, setShowDropdown] = useState(false);
     const [micAvailable, setMicAvailable] = useState<boolean | null>(null); // null = checking, true = available, false = unavailable
     const [showMicTooltip, setShowMicTooltip] = useState(false);
+    const [attachedImages, setAttachedImages] = useState<{ id: string; url: string; file: File }[]>([]);
 
-    const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
@@ -36,6 +37,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
     const rafRef = useRef<number | null>(null);
     const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
     const micCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Check microphone availability
     const checkMicrophoneAvailability = useCallback(async () => {
@@ -247,25 +249,75 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
         setMode('text');
     }, [interimTranscript]);
 
-    const handleTextChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (interimTranscript) {
             setInterimTranscript('');
         }
         setTextValue(e.target.value);
+
+        // Auto-resize textarea - cap at 200px then scroll
+        const textarea = e.target;
+        const maxHeight = 200;
+
+        // Temporarily reset to measure true scrollHeight
+        textarea.style.height = '40px';
+        const scrollHeight = textarea.scrollHeight;
+
+        if (scrollHeight <= maxHeight) {
+            textarea.style.height = Math.max(40, scrollHeight) + 'px';
+            textarea.style.overflowY = 'hidden';
+        } else {
+            textarea.style.height = maxHeight + 'px';
+            textarea.style.overflowY = 'auto';
+        }
     }, [interimTranscript]);
+
+    // Handle image file selection
+    const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const url = URL.createObjectURL(file);
+                setAttachedImages(prev => [...prev, {
+                    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    url,
+                    file
+                }]);
+            }
+        });
+
+        // Reset input so same file can be selected again
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    }, []);
+
+    // Remove an attached image
+    const handleRemoveImage = useCallback((id: string) => {
+        setAttachedImages(prev => {
+            const image = prev.find(img => img.id === id);
+            if (image) {
+                URL.revokeObjectURL(image.url);
+            }
+            return prev.filter(img => img.id !== id);
+        });
+    }, []);
 
     const handleSend = useCallback(() => {
         const finalText = mode === 'voice' && interimTranscript
             ? textValue + (textValue ? ' ' : '') + interimTranscript
             : textValue;
 
-        if (finalText.trim()) {
+        if (finalText.trim() || attachedImages.length > 0) {
             onSend(finalText.trim());
             setTextValue('');
             setInterimTranscript('');
+            setAttachedImages([]);
             setMode('text');
         }
-    }, [mode, interimTranscript, textValue, onSend]);
+    }, [mode, interimTranscript, textValue, onSend, attachedImages]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -292,9 +344,9 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
     return (
         <div
             className={`
-        relative flex items-center gap-3 
-        rounded-full p-2 
-        w-full max-w-[632px] h-14
+        relative flex items-end gap-3 
+        rounded-[28px] p-2 
+        w-full max-w-[632px] min-h-14
         ${isMovingGlowVariant ? 'bg-transparent overflow-hidden' : 'bg-white border border-gray-200'}
         ${isGlowVariant ? 'overflow-visible' : ''}
         ${isVoiceMode && isGlowVariant ? 'shadow-lg' : ''}
@@ -315,8 +367,45 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                 <IntelligenceEffect isActive={isVoiceMode} intensity={glowIntensity} contained={false} />
             )}
 
-            {/* Main Content */}
-            <div className="relative z-10 flex items-center w-full h-full gap-3">
+            {/* Hidden file input for image upload */}
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageSelect}
+            />
+
+            {/* Main Content - Column layout with attachments above input */}
+            <div className="relative z-10 flex flex-col w-full gap-2">
+                {/* Image Preview Section */}
+                {attachedImages.length > 0 && (
+                    <div className="flex flex-wrap gap-2 px-2 pt-2">
+                        {attachedImages.map(img => (
+                            <div
+                                key={img.id}
+                                className="relative group w-16 h-16 rounded-lg border-2 border-gray-200 overflow-visible bg-white"
+                            >
+                                <img
+                                    src={img.url}
+                                    alt="Attachment preview"
+                                    className="w-full h-full object-cover rounded-lg"
+                                />
+                                {/* Remove button - centered on corner border */}
+                                <button
+                                    onClick={() => handleRemoveImage(img.id)}
+                                    className="absolute -top-2 -right-2 w-5 h-5 bg-black rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                                    aria-label="Remove image"
+                                >
+                                    <X size={12} className="text-white" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Input Row */}
                 <AnimatePresence mode="wait">
                     {showInputMode ? (
                         <motion.div
@@ -324,7 +413,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="flex items-center w-full h-full gap-3"
+                            className="flex items-end w-full gap-3"
                         >
                             {/* Plus Button with Dropdown */}
                             <div className="relative">
@@ -348,7 +437,10 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                                     >
                                         <button
                                             className="w-full px-4 py-3 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
-                                            onClick={() => setShowDropdown(false)}
+                                            onClick={() => {
+                                                setShowDropdown(false);
+                                                fileInputRef.current?.click();
+                                            }}
                                         >
                                             <Image size={18} className="text-gray-500" />
                                             <span className="text-sm">Upload Image</span>
@@ -365,10 +457,11 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                             </div>
 
                             {/* Text Input */}
-                            <input
+                            <textarea
                                 ref={inputRef}
-                                type="text"
-                                className="flex-1 min-w-0 h-full bg-transparent border-none outline-none text-base text-gray-900 font-normal text-ellipsis"
+                                rows={1}
+                                className="flex-1 min-w-0 bg-transparent border-none outline-none text-base text-gray-900 font-normal resize-none overflow-y-auto placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden"
+                                style={{ height: '40px', maxHeight: '200px', lineHeight: '24px', paddingTop: '8px', paddingBottom: '8px' }}
                                 placeholder={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? "Listening..." : "How can Expert AI help?"}
                                 value={displayValue}
                                 onChange={handleTextChange}
@@ -409,7 +502,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 5 }}
                                             transition={{ duration: 0.15 }}
-                                            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50"
+                                            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[100]"
                                         >
                                             <div
                                                 className="text-white font-normal shadow-lg whitespace-nowrap px-2 flex items-center"

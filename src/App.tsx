@@ -713,7 +713,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                     {/* Drag Handle - only show when chat panel is open */}
                     {chatPanelOpen && (
                         <div
-                            className="w-px hover:w-0.5 bg-[#DADADA] hover:bg-blue-400 cursor-col-resize transition-all relative group flex-shrink-0 z-30"
+                            className="w-0.5 bg-transparent cursor-col-resize transition-all relative group flex-shrink-0 z-30 flex items-stretch justify-center"
                             onMouseDown={(e) => {
                                 e.preventDefault();
                                 const startX = e.clientX;
@@ -734,6 +734,8 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                 document.addEventListener('mouseup', handleMouseUp);
                             }}
                         >
+                            {/* Visible line: 1px gray default, 2px blue on hover */}
+                            <div className="w-px group-hover:w-0.5 h-full bg-[#DADADA] group-hover:bg-blue-400 transition-all" />
                             <div className="absolute inset-y-0 -left-0.5 -right-0.5 group-hover:bg-blue-400/20 z-30" />
                         </div>
                     )}
