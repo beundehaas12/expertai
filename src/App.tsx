@@ -115,6 +115,33 @@ function getSimulatedResponse() {
     return generalResponses[Math.floor(Math.random() * generalResponses.length)];
 }
 
+function getImageAnalysisResponse(imageCount: number) {
+    const singular = imageCount === 1;
+    return `Thanks for sharing ${singular ? 'this image' : `these ${imageCount} images`}! I've analyzed ${singular ? 'it' : 'them'} and here are my findings:
+
+## Image Analysis
+
+Based on my review of ${singular ? 'the uploaded image' : `the ${imageCount} uploaded images`}, I can identify several key elements:
+
+### Visual Elements
+• **Composition**: The ${singular ? 'image features' : 'images feature'} a well-balanced layout with clear focal points
+• **Color Palette**: I notice a harmonious color scheme that creates visual cohesion
+• **Quality**: The ${singular ? 'resolution appears' : 'resolutions appear'} suitable for detailed analysis
+
+### Key Observations
+1. **Subject Matter**: The main subject${singular ? '' : 's'} ${singular ? 'is' : 'are'} clearly visible and well-defined
+2. **Context**: The surrounding elements provide helpful context
+3. **Details**: Several interesting details are worth noting for further discussion
+
+### Recommendations
+Based on this analysis, I'd suggest:
+- Consider the lighting conditions for optimal results
+- The framing effectively highlights the important elements
+- Additional context would help provide more specific insights
+
+Would you like me to focus on any particular aspect of ${singular ? 'this image' : 'these images'}? I'm happy to provide more detailed analysis on specific areas of interest.`;
+}
+
 function getRandomDelay() {
     // Random delay between 500ms and 2500ms
     return 500 + Math.random() * 2000;
@@ -127,7 +154,7 @@ export default function App() {
 
     // Queue System: Stores pending user inputs or actions
     // userMessage is stored when the message was queued while AI was busy
-    const [pendingQueue, setPendingQueue] = useState<{ id: string, text: string, type: 'text' | 'selection', userMessage?: ChatMessageType }[]>([]);
+    const [pendingQueue, setPendingQueue] = useState<{ id: string, text: string, type: 'text' | 'selection', imageCount?: number, userMessage?: ChatMessageType }[]>([]);
 
     // AI Status: 
     // - 'idle': Doing nothing
@@ -207,12 +234,13 @@ export default function App() {
                 id: userMessage.id,
                 text,
                 type: 'text' as const,
+                imageCount: images?.length,
                 userMessage // Store the full message object to render later
             }]);
         } else {
             // AI is idle - add message immediately and queue for processing
             setMessages(prev => [...prev, userMessage]);
-            setPendingQueue(prev => [...prev, { id: generateId(), text, type: 'text' as const }]);
+            setPendingQueue(prev => [...prev, { id: generateId(), text, type: 'text' as const, imageCount: images?.length }]);
         }
         setChatStarted(true);
     }, [aiStatus]);
@@ -238,7 +266,9 @@ export default function App() {
                 aiProcessingTimeoutRef.current = null;
 
                 // Determine response type based on request
-                let responseText = getSimulatedResponse();
+                let responseText = currentRequest.imageCount && currentRequest.imageCount > 0
+                    ? getImageAnalysisResponse(currentRequest.imageCount)
+                    : getSimulatedResponse();
                 if (currentRequest.type === 'selection') {
                     if (currentRequest.text.startsWith('# Understanding')) {
                         responseText = currentRequest.text;

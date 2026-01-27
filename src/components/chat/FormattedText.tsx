@@ -53,6 +53,15 @@ export function FormattedText({ text }: FormattedTextProps) {
             );
         }
 
+        // Third level heading (### )
+        if (line.startsWith('### ')) {
+            return (
+                <h4 key={index} className="text-sm font-semibold text-gray-700 mt-3 mb-1">
+                    {renderInlineFormatting(line.slice(4))}
+                </h4>
+            );
+        }
+
         // Horizontal rule (---)
         if (line.trim() === '---') {
             return <hr key={index} className="my-4 border-gray-200" />;
