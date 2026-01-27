@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { ChatMessage as ChatMessageType } from '@/types';
 import { MessageActions } from './MessageActions';
 import { StreamingText } from './StreamingText';
 import { FormattedText } from './FormattedText';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ChevronDown, Brain, CheckCircle2 } from 'lucide-react';
 
 interface ChatMessageProps {
     message: ChatMessageType;
@@ -16,9 +17,11 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
     const isSystem = message.sender === 'system';
     const isStreaming = message.isStreaming && !isUser && !isSystem;
     const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+    const [showThinkingSteps, setShowThinkingSteps] = useState(false);
 
     const images = message.images || [];
     const hasMultipleImages = images.length > 1;
+    const hasThinkingSteps = !isUser && !isSystem && message.thinkingSteps && message.thinkingSteps.length > 0;
 
     // System notice (e.g., "Operation cancelled by user") - left aligned
     if (isSystem && message.isSystemNotice) {
@@ -47,7 +50,46 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
 
     return (
         <>
-            <div className={`max-w-[80%] ${isUser ? 'self-end' : 'self-start'}`}>
+            <div id={`message-${message.id}`} className={`max-w-[80%] ${isUser ? 'self-end' : 'self-start'}`}>
+                {/* Show Thinking Steps expandable for AI messages with thinking steps */}
+                {hasThinkingSteps && !isStreaming && (
+                    <div className="mb-2">
+                        <button
+                            onClick={() => setShowThinkingSteps(!showThinkingSteps)}
+                            className="flex items-center gap-1.5 font-sans transition-colors hover:opacity-80"
+                            style={{ fontSize: '14px', lineHeight: '21px', color: '#232323' }}
+                        >
+                            <img src="./img/expert-ai-spark.svg" alt="" className="w-4 h-4" />
+                            <span>Show thinking steps</span>
+                            <motion.span
+                                animate={{ rotate: showThinkingSteps ? 180 : 0 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <ChevronDown size={14} />
+                            </motion.span>
+                        </button>
+                        <AnimatePresence>
+                            {showThinkingSteps && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
+                                        {message.thinkingSteps!.map((step, index) => (
+                                            <div key={index} className="flex items-start gap-2 text-xs text-slate-600">
+                                                <CheckCircle2 size={12} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+                                                <span>{step}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                )}
                 <div
                     className={`
                 font-sans text-base leading-relaxed break-words

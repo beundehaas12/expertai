@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { X, Settings, ArrowDown } from 'lucide-react';
+import { X, Settings, ArrowDown, Brain } from 'lucide-react';
 import { VoiceInput } from '@/components/voice';
-import { ChatMessage, TypingIndicator, PendingIndicator } from '@/components/chat';
+import { ChatMessage, TypingIndicator, PendingIndicator, DeepThinkingBox } from '@/components/chat';
 import { ActionBar, ExpertButton, SideModal, SelectionTooltip } from '@/components/ui';
 import type { ChatMessage as ChatMessageType, VoiceVariant, ButtonPosition } from '@/types';
 import './index.css';
@@ -154,7 +154,7 @@ export default function App() {
 
     // Queue System: Stores pending user inputs or actions
     // userMessage is stored when the message was queued while AI was busy
-    const [pendingQueue, setPendingQueue] = useState<{ id: string, text: string, type: 'text' | 'selection', imageCount?: number, userMessage?: ChatMessageType }[]>([]);
+    const [pendingQueue, setPendingQueue] = useState<{ id: string, text: string, type: 'text' | 'selection', imageCount?: number, deepThinking?: boolean, userMessage?: ChatMessageType }[]>([]);
 
     // AI Status: 
     // - 'idle': Doing nothing
@@ -168,6 +168,10 @@ export default function App() {
     // Derived state for existing components using boolean flags
     const isTyping = aiStatus === 'thinking';
     const isAiBusy = aiStatus !== 'idle';
+
+    // Deep thinking state (toggle in header)
+    const [deepThinking, setDeepThinking] = useState(false);
+    const [currentDeepThinking, setCurrentDeepThinking] = useState(false);
 
     const [voiceVariant, setVoiceVariant] = useState<VoiceVariant>('glow');
     const [splitView, setSplitView] = useState(() => {
@@ -188,7 +192,13 @@ export default function App() {
         const viewSaved = localStorage.getItem('expertai-view');
         return viewSaved === 'split' ? 'actionbar' : 'none';
     });
-
+    const [thinkingAnimation, setThinkingAnimation] = useState<'spark' | 'lottie'>(() => {
+        const saved = localStorage.getItem('expertai-thinking-animation');
+        if (saved === 'spark' || saved === 'lottie') {
+            return saved;
+        }
+        return 'spark';
+    });
 
     // Persist view preference
     useEffect(() => {
@@ -199,6 +209,11 @@ export default function App() {
     useEffect(() => {
         localStorage.setItem('expertai-button-position', buttonPosition);
     }, [buttonPosition]);
+
+    // Persist thinking animation preference
+    useEffect(() => {
+        localStorage.setItem('expertai-thinking-animation', thinkingAnimation);
+    }, [thinkingAnimation]);
 
     // Update button position when switching views (only if position hasn't been manually set)
     const handleViewChange = (isSplit: boolean) => {
@@ -214,7 +229,7 @@ export default function App() {
     }, []);
 
     // 1. INPUT HANDLER: Adds to queue
-    const handleSend = useCallback((text: string, images?: string[]) => {
+    const handleSend = useCallback((text: string, images?: string[], useDeepThinking?: boolean) => {
         shouldAutoScrollRef.current = true;
         setShowScrollButton(false);
 
@@ -235,15 +250,16 @@ export default function App() {
                 text,
                 type: 'text' as const,
                 imageCount: images?.length,
+                deepThinking: useDeepThinking,
                 userMessage // Store the full message object to render later
             }]);
         } else {
             // AI is idle - add message immediately and queue for processing
             setMessages(prev => [...prev, userMessage]);
-            setPendingQueue(prev => [...prev, { id: generateId(), text, type: 'text' as const, imageCount: images?.length }]);
+            setPendingQueue(prev => [...prev, { id: generateId(), text, type: 'text' as const, imageCount: images?.length, deepThinking: useDeepThinking }]);
         }
         setChatStarted(true);
-    }, [aiStatus]);
+    }, [aiStatus, messages.length]);
 
     // 2. QUEUE PROCESSOR: Watches Queue + Status
     useEffect(() => {
@@ -256,12 +272,22 @@ export default function App() {
             const currentRequest = pendingQueue[0];
             setPendingQueue(prev => prev.slice(1));
 
+            // Set current deep thinking mode for display
+            const isDeep = currentRequest.deepThinking ?? false;
+            setCurrentDeepThinking(isDeep);
+
             // If this request has a stored userMessage (was queued while busy), add it now
             if (currentRequest.userMessage) {
                 setMessages(prev => [...prev, currentRequest.userMessage!]);
             }
 
-            // Simulate Thinking Delay - store timeout ID for cancellation
+            // For deep thinking, we don't use setTimeout - DeepThinkingBox will call our callback
+            if (isDeep) {
+                // Deep thinking box will manage the delay and call onComplete
+                return;
+            }
+
+            // Quick mode: Simulate Thinking Delay - store timeout ID for cancellation
             aiProcessingTimeoutRef.current = setTimeout(() => {
                 aiProcessingTimeoutRef.current = null;
 
@@ -352,6 +378,26 @@ export default function App() {
             }
         }, 200);
 
+    }, []);
+
+    // DEEP THINKING COMPLETE HANDLER
+    // Called by DeepThinkingBox when all steps finish
+    const handleDeepThinkingComplete = useCallback((steps: string[]) => {
+        // Generate response text
+        const responseText = getSimulatedResponse();
+
+        // Add AI Message with thinking steps -> Transition to 'streaming'
+        const aiMessage: ChatMessageType = {
+            id: generateId(),
+            text: responseText,
+            sender: 'ai',
+            timestamp: Date.now(),
+            isStreaming: true,
+            thinkingSteps: steps,
+        };
+
+        setMessages(prev => [...prev, aiMessage]);
+        setAiStatus('streaming');
     }, []);
 
 
@@ -537,8 +583,26 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                     </button>
                 </nav>
 
-                {/* Right Side - Settings + Expert Button */}
-                <div className="flex items-center gap-3">
+                {/* Right Side - Deep Thinking Toggle + Settings + Expert Button */}
+                <div className="flex items-center gap-4">
+                    {/* Deep Thinking Toggle */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Deep Thinking</span>
+                        <button
+                            onClick={() => setDeepThinking(!deepThinking)}
+                            className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${deepThinking ? 'bg-black' : 'bg-gray-300'
+                                }`}
+                            title={deepThinking ? 'Deep Thinking is On' : 'Deep Thinking is Off'}
+                            role="switch"
+                            aria-checked={deepThinking}
+                        >
+                            <span
+                                className={`absolute inset-y-0 my-auto w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${deepThinking ? 'left-6' : 'left-1'
+                                    }`}
+                            />
+                        </button>
+                    </div>
+
                     <button
                         onClick={() => setSettingsOpen(true)}
                         className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors"
@@ -561,6 +625,8 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                 buttonPosition={buttonPosition}
                 onButtonPositionChange={setButtonPosition}
                 isSplitView={splitView}
+                thinkingAnimation={thinkingAnimation}
+                onThinkingAnimationChange={setThinkingAnimation}
             />
 
             {/* Main Layout */}
@@ -805,7 +871,13 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                             />
                                         ))}
                                         <AnimatePresence>
-                                            {isTyping && <TypingIndicator />}
+                                            {isTyping && currentDeepThinking && (
+                                                <DeepThinkingBox
+                                                    isActive={true}
+                                                    onComplete={handleDeepThinkingComplete}
+                                                />
+                                            )}
+                                            {isTyping && !currentDeepThinking && <TypingIndicator variant={thinkingAnimation} />}
                                             {/* Show Pending Bubble if queue has items and we are busy (Thinking or Streaming) */}
                                             {pendingQueue.length > 0 && (aiStatus === 'thinking' || aiStatus === 'streaming') && (
                                                 <PendingIndicator pendingMessages={pendingQueue.filter(q => q.userMessage).map(q => q.userMessage!)} />
@@ -823,7 +895,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                     <h1 className="text-3xl font-medium text-gray-900 text-center mb-10">
                                         How can I help you?
                                     </h1>
-                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} />
+                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                                 </div>
                             )}
 
@@ -841,7 +913,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             {/* Input Area - fixed at bottom */}
                             {chatStarted && (
                                 <div className="flex-shrink-0 flex items-center justify-center px-4 pb-4">
-                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} />
+                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                                 </div>
                             )}
                         </div>
@@ -863,7 +935,13 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                     />
                                 ))}
                                 <AnimatePresence>
-                                    {isTyping && <TypingIndicator />}
+                                    {isTyping && currentDeepThinking && (
+                                        <DeepThinkingBox
+                                            isActive={true}
+                                            onComplete={handleDeepThinkingComplete}
+                                        />
+                                    )}
+                                    {isTyping && !currentDeepThinking && <TypingIndicator variant={thinkingAnimation} />}
                                     {/* Show Pending Bubble if queue has items and we are busy (Thinking or Streaming) */}
                                     {pendingQueue.length > 0 && (aiStatus === 'thinking' || aiStatus === 'streaming') && (
                                         <PendingIndicator pendingMessages={pendingQueue.filter(q => q.userMessage).map(q => q.userMessage!)} />
@@ -881,7 +959,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             <h1 className="text-3xl font-medium text-gray-900 text-center mb-10">
                                 How can I help you?
                             </h1>
-                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} />
+                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                         </div>
                     )}
 
@@ -899,7 +977,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                     {/* Input Area - fixed at bottom */}
                     {chatStarted && (
                         <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-4">
-                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} />
+                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                         </div>
                     )}
                 </div>

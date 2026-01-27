@@ -1,6 +1,13 @@
 import { motion } from 'framer-motion';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
-export function TypingIndicator() {
+export type ThinkingAnimation = 'spark' | 'lottie';
+
+interface TypingIndicatorProps {
+    variant?: ThinkingAnimation;
+}
+
+export function TypingIndicator({ variant = 'spark' }: TypingIndicatorProps) {
     // "Perfect Morph" Loading Animation
     // Morphs between the "Spark" logo and a spinning "Broken Ring".
     // - Spark: Static start shape (0deg).
@@ -37,53 +44,64 @@ export function TypingIndicator() {
             exit={{ opacity: 0, y: -10 }}
             className="self-start flex items-center gap-3 py-3"
         >
-            <div className="relative w-6 h-6">
-                <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="overflow-visible">
-                    <motion.g
-                        clipPath="url(#clip0_typing)"
-                        animate={{
-                            rotate: [0, 0, 360, 360]
-                        }}
-                        transition={{
-                            duration: DURATION,
-                            repeat: Infinity,
-                            times: TIMES,
-                            ease: "easeInOut"
-                        }}
-                        style={{ originX: '32px', originY: '32px', transformBox: 'view-box' }}
-                    >
-                        {/* Green */}
-                        <motion.path
-                            fill="#85BC20"
-                            animate={{ d: [SPARK_GREEN, RING_GREEN, RING_GREEN, SPARK_GREEN] }}
-                            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
-                        />
-                        {/* Red */}
-                        <motion.path
-                            fill="#E5202E"
-                            animate={{ d: [SPARK_RED, RING_RED, RING_RED, SPARK_RED] }}
-                            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
-                        />
-                        {/* Blue */}
-                        <motion.path
-                            fill="#007AC3"
-                            animate={{ d: [SPARK_BLUE, RING_BLUE, RING_BLUE, SPARK_BLUE] }}
-                            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
-                        />
-                        {/* Black */}
-                        <motion.path
-                            fill="#232323"
-                            animate={{ d: [SPARK_BLACK, RING_BLACK, RING_BLACK, SPARK_BLACK] }}
-                            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
-                        />
-                    </motion.g>
-                    <defs>
-                        <clipPath id="clip0_typing">
-                            <rect width="64" height="64" fill="white" />
-                        </clipPath>
-                    </defs>
-                </svg>
-            </div>
+            {variant === 'lottie' ? (
+                <div className="relative w-6 h-6">
+                    <DotLottieReact
+                        src="https://lottie.host/ffa64a10-bdb4-428d-a857-506dd9c99743/PeznJG0pDA.lottie"
+                        loop
+                        autoplay
+                        style={{ width: 24, height: 24 }}
+                    />
+                </div>
+            ) : (
+                <div className="relative w-6 h-6">
+                    <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="overflow-visible">
+                        <motion.g
+                            clipPath="url(#clip0_typing)"
+                            animate={{
+                                rotate: [0, 0, 360, 360]
+                            }}
+                            transition={{
+                                duration: DURATION,
+                                repeat: Infinity,
+                                times: TIMES,
+                                ease: "easeInOut"
+                            }}
+                            style={{ originX: '32px', originY: '32px', transformBox: 'view-box' }}
+                        >
+                            {/* Green */}
+                            <motion.path
+                                fill="#85BC20"
+                                animate={{ d: [SPARK_GREEN, RING_GREEN, RING_GREEN, SPARK_GREEN] }}
+                                transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
+                            />
+                            {/* Red */}
+                            <motion.path
+                                fill="#E5202E"
+                                animate={{ d: [SPARK_RED, RING_RED, RING_RED, SPARK_RED] }}
+                                transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
+                            />
+                            {/* Blue */}
+                            <motion.path
+                                fill="#007AC3"
+                                animate={{ d: [SPARK_BLUE, RING_BLUE, RING_BLUE, SPARK_BLUE] }}
+                                transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
+                            />
+                            {/* Black */}
+                            <motion.path
+                                fill="#232323"
+                                animate={{ d: [SPARK_BLACK, RING_BLACK, RING_BLACK, SPARK_BLACK] }}
+                                transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: SMOOTH_EASE }}
+                            />
+                        </motion.g>
+                        <defs>
+                            <clipPath id="clip0_typing">
+                                <rect width="64" height="64" fill="white" />
+                            </clipPath>
+                        </defs>
+                    </svg>
+                </div>
+            )}
 
             {/* Thinking text with animated dots */}
             <span className="text-sm font-medium" style={{ color: '#232323' }}>

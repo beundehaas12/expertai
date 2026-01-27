@@ -16,7 +16,11 @@ export interface ChatMessage {
     isCancelled?: boolean;
     isSystemNotice?: boolean;
     images?: string[]; // URLs of attached images
+    thinkingSteps?: string[]; // Chain-of-thought steps for deep thinking
 }
+
+// Thinking mode type
+export type ThinkingMode = 'quick' | 'deep';
 
 // Voice input state
 export type VoiceInputMode = 'text' | 'voice';

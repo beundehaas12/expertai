@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { X, Copy, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 type VoiceVariant = 'waveform' | 'glow' | 'moving-glow' | 'intelligence';
 type ButtonPosition = 'none' | 'header' | 'actionbar' | 'floating';
+export type ThinkingAnimation = 'spark' | 'lottie';
 
 interface SideModalProps {
     isOpen: boolean;
@@ -15,6 +17,8 @@ interface SideModalProps {
     buttonPosition?: ButtonPosition;
     onButtonPositionChange?: (position: ButtonPosition) => void;
     isSplitView?: boolean;
+    thinkingAnimation?: ThinkingAnimation;
+    onThinkingAnimationChange?: (animation: ThinkingAnimation) => void;
 }
 
 const voiceVariants: { value: VoiceVariant; label: string }[] = [
@@ -124,6 +128,8 @@ export function SideModal({
     buttonPosition = 'header',
     onButtonPositionChange,
     isSplitView = false,
+    thinkingAnimation = 'spark',
+    onThinkingAnimationChange,
 }: SideModalProps) {
     const [copied, setCopied] = useState(false);
 
@@ -298,35 +304,99 @@ export function SideModal({
                                     {/* Thinking Animation Section */}
                                     <div style={{ marginBottom: '24px' }}>
                                         <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '12px', marginTop: 0, textAlign: 'left' }}>
-                                            Thinking Animation
+                                            Quick Thinking Animation
                                         </h3>
 
-                                        {/* Animation Preview */}
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '12px',
-                                            padding: '16px',
-                                            backgroundColor: '#f9fafb',
-                                            borderRadius: '8px',
-                                            marginBottom: '12px',
-                                        }}>
-                                            <AnimationPreview />
-                                            <span style={{ fontSize: '14px', fontWeight: 500, color: '#232323' }}>
-                                                Thinking
-                                                <motion.span
-                                                    animate={{ opacity: [0, 1, 1, 0] }}
-                                                    transition={{ duration: 1.5, times: [0, 0.2, 0.8, 1], repeat: Infinity }}
-                                                >.</motion.span>
-                                                <motion.span
-                                                    animate={{ opacity: [0, 0, 1, 1, 0] }}
-                                                    transition={{ duration: 1.5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity }}
-                                                >.</motion.span>
-                                                <motion.span
-                                                    animate={{ opacity: [0, 0, 0, 1, 0] }}
-                                                    transition={{ duration: 1.5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity }}
-                                                >.</motion.span>
-                                            </span>
+                                        {/* Animation Options */}
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                                            {/* Spark Morph Option */}
+                                            <button
+                                                onClick={() => onThinkingAnimationChange?.('spark')}
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '12px',
+                                                    padding: '12px 16px',
+                                                    borderRadius: '8px',
+                                                    border: thinkingAnimation === 'spark' ? '2px solid #111827' : '1px solid #DADADA',
+                                                    backgroundColor: thinkingAnimation === 'spark' ? '#F9FAFB' : '#ffffff',
+                                                    cursor: 'pointer',
+                                                    textAlign: 'left',
+                                                    transition: 'all 0.15s ease',
+                                                }}
+                                            >
+                                                {/* Radio button */}
+                                                <div
+                                                    style={{
+                                                        width: '18px',
+                                                        height: '18px',
+                                                        borderRadius: '50%',
+                                                        border: thinkingAnimation === 'spark' ? '2px solid #111827' : '2px solid #9ca3af',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        flexShrink: 0,
+                                                    }}
+                                                >
+                                                    {thinkingAnimation === 'spark' && (
+                                                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#111827' }} />
+                                                    )}
+                                                </div>
+                                                {/* Spark Preview */}
+                                                <div style={{ width: 32, height: 32, flexShrink: 0 }}>
+                                                    <AnimationPreview />
+                                                </div>
+                                                <span style={{ fontSize: '14px', fontWeight: thinkingAnimation === 'spark' ? 500 : 400, color: '#111827' }}>
+                                                    Spark Morph
+                                                </span>
+                                            </button>
+
+                                            {/* Lottie Option */}
+                                            <button
+                                                onClick={() => onThinkingAnimationChange?.('lottie')}
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '12px',
+                                                    padding: '12px 16px',
+                                                    borderRadius: '8px',
+                                                    border: thinkingAnimation === 'lottie' ? '2px solid #111827' : '1px solid #DADADA',
+                                                    backgroundColor: thinkingAnimation === 'lottie' ? '#F9FAFB' : '#ffffff',
+                                                    cursor: 'pointer',
+                                                    textAlign: 'left',
+                                                    transition: 'all 0.15s ease',
+                                                }}
+                                            >
+                                                {/* Radio button */}
+                                                <div
+                                                    style={{
+                                                        width: '18px',
+                                                        height: '18px',
+                                                        borderRadius: '50%',
+                                                        border: thinkingAnimation === 'lottie' ? '2px solid #111827' : '2px solid #9ca3af',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        flexShrink: 0,
+                                                    }}
+                                                >
+                                                    {thinkingAnimation === 'lottie' && (
+                                                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#111827' }} />
+                                                    )}
+                                                </div>
+                                                {/* Lottie Preview */}
+                                                <div style={{ width: 32, height: 32, flexShrink: 0 }}>
+                                                    <DotLottieReact
+                                                        src="https://lottie.host/ffa64a10-bdb4-428d-a857-506dd9c99743/PeznJG0pDA.lottie"
+                                                        loop
+                                                        autoplay
+                                                        style={{ width: 32, height: 32 }}
+                                                    />
+                                                </div>
+                                                <span style={{ fontSize: '14px', fontWeight: thinkingAnimation === 'lottie' ? 500 : 400, color: '#111827' }}>
+                                                    Lottie Orbs
+                                                </span>
+                                            </button>
                                         </div>
 
                                         {/* Copy Code Button */}

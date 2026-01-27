@@ -8,16 +8,17 @@ import { IntelligenceEffect } from './IntelligenceEffect';
 import type { VoiceVariant, VoiceInputMode } from '@/types';
 
 interface VoiceInputProps {
-    onSend: (text: string, images?: string[]) => void;
+    onSend: (text: string, images?: string[], deepThinking?: boolean) => void;
     variant?: VoiceVariant;
     dropdownAbove?: boolean;
     splitView?: boolean;
     onVoiceStateChange?: (isVoiceMode: boolean, intensity: number) => void;
     isAiBusy?: boolean;
     onStop?: () => void;
+    deepThinking?: boolean;
 }
 
-export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false, splitView = false, onVoiceStateChange, isAiBusy = false, onStop }: VoiceInputProps) {
+export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false, splitView = false, onVoiceStateChange, isAiBusy = false, onStop, deepThinking = false }: VoiceInputProps) {
     const [mode, setMode] = useState<VoiceInputMode>('text');
     const [textValue, setTextValue] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
@@ -311,15 +312,15 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
             : textValue;
 
         if (finalText.trim() || attachedImages.length > 0) {
-            // Pass image URLs to onSend
+            // Pass image URLs and deep thinking mode to onSend
             const imageUrls = attachedImages.map(img => img.url);
-            onSend(finalText.trim(), imageUrls.length > 0 ? imageUrls : undefined);
+            onSend(finalText.trim(), imageUrls.length > 0 ? imageUrls : undefined, deepThinking);
             setTextValue('');
             setInterimTranscript('');
             setAttachedImages([]);
             setMode('text');
         }
-    }, [mode, interimTranscript, textValue, onSend, attachedImages]);
+    }, [mode, interimTranscript, textValue, onSend, attachedImages, deepThinking]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -525,6 +526,8 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                                     )}
                                 </AnimatePresence>
                             </div>
+
+
 
                             {/* Send/Stop Button */}
                             <motion.button
