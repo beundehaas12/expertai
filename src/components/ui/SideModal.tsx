@@ -32,11 +32,11 @@ const buttonPositions: { value: ButtonPosition; label: string }[] = [
 ];
 
 // Animation code for developers to copy
-const ANIMATION_CODE = `// ThinkingAnimation Component
+const ANIMATION_CODE = `// ThinkingIndicator Component
 // Dependencies: framer-motion
 import { motion } from 'framer-motion';
 
-export function ThinkingAnimation() {
+export function ThinkingIndicator() {
   // Spark paths (static logo shape)
   const SPARK_GREEN = "M29.71 16.83 C23.90 27.22 12.68 34.08 0 34.08 L0 29.92 C12.47 29.92 23.06 22.44 27.64 11.64 C28.05 13.09 28.68 14.34 29.71 16.83 Z";
   const SPARK_RED = "M47.38 29.71 C36.99 23.90 29.92 12.68 29.92 0 L34.08 0 C34.08 12.47 41.56 23.06 52.36 27.64 C50.91 28.05 49.66 28.68 47.38 29.71 Z";
@@ -53,19 +53,30 @@ export function ThinkingAnimation() {
   const TIMES = [0, 0.3, 0.7, 1];
 
   return (
-    <div className="relative w-6 h-6">
-      <svg width="24" height="24" viewBox="0 0 64 64" fill="none">
-        <motion.g
-          animate={{ rotate: [0, 0, 360, 360] }}
-          transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }}
-          style={{ originX: '32px', originY: '32px', transformBox: 'view-box' }}
-        >
-          <motion.path fill="#85BC20" animate={{ d: [SPARK_GREEN, RING_GREEN, RING_GREEN, SPARK_GREEN] }} transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }} />
-          <motion.path fill="#E5202E" animate={{ d: [SPARK_RED, RING_RED, RING_RED, SPARK_RED] }} transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }} />
-          <motion.path fill="#007AC3" animate={{ d: [SPARK_BLUE, RING_BLUE, RING_BLUE, SPARK_BLUE] }} transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }} />
-          <motion.path fill="#232323" animate={{ d: [SPARK_BLACK, RING_BLACK, RING_BLACK, SPARK_BLACK] }} transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }} />
-        </motion.g>
-      </svg>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      {/* Animated Icon */}
+      <div style={{ width: 24, height: 24 }}>
+        <svg width="24" height="24" viewBox="0 0 64 64" fill="none">
+          <motion.g
+            animate={{ rotate: [0, 0, 360, 360] }}
+            transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }}
+            style={{ originX: '32px', originY: '32px', transformBox: 'view-box' }}
+          >
+            <motion.path fill="#85BC20" animate={{ d: [SPARK_GREEN, RING_GREEN, RING_GREEN, SPARK_GREEN] }} transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }} />
+            <motion.path fill="#E5202E" animate={{ d: [SPARK_RED, RING_RED, RING_RED, SPARK_RED] }} transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }} />
+            <motion.path fill="#007AC3" animate={{ d: [SPARK_BLUE, RING_BLUE, RING_BLUE, SPARK_BLUE] }} transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }} />
+            <motion.path fill="#232323" animate={{ d: [SPARK_BLACK, RING_BLACK, RING_BLACK, SPARK_BLACK] }} transition={{ duration: DURATION, repeat: Infinity, times: TIMES, ease: "easeInOut" }} />
+          </motion.g>
+        </svg>
+      </div>
+
+      {/* Text with animated dots - cycle: appear 1-2-3 then all fade out */}
+      <span style={{ fontSize: 14, fontWeight: 500, color: '#232323' }}>
+        Thinking
+        <motion.span animate={{ opacity: [0, 1, 1, 0] }} transition={{ duration: 1.5, times: [0, 0.2, 0.8, 1], repeat: Infinity }}>.</motion.span>
+        <motion.span animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: 1.5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity }}>.</motion.span>
+        <motion.span animate={{ opacity: [0, 0, 0, 1, 0] }} transition={{ duration: 1.5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity }}>.</motion.span>
+      </span>
     </div>
   );
 }`;
@@ -301,7 +312,21 @@ export function SideModal({
                                             marginBottom: '12px',
                                         }}>
                                             <AnimationPreview />
-                                            <span style={{ fontSize: '14px', fontWeight: 500, color: '#232323' }}>Thinking...</span>
+                                            <span style={{ fontSize: '14px', fontWeight: 500, color: '#232323' }}>
+                                                Thinking
+                                                <motion.span
+                                                    animate={{ opacity: [0, 1, 1, 0] }}
+                                                    transition={{ duration: 1.5, times: [0, 0.2, 0.8, 1], repeat: Infinity }}
+                                                >.</motion.span>
+                                                <motion.span
+                                                    animate={{ opacity: [0, 0, 1, 1, 0] }}
+                                                    transition={{ duration: 1.5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity }}
+                                                >.</motion.span>
+                                                <motion.span
+                                                    animate={{ opacity: [0, 0, 0, 1, 0] }}
+                                                    transition={{ duration: 1.5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity }}
+                                                >.</motion.span>
+                                            </span>
                                         </div>
 
                                         {/* Copy Code Button */}

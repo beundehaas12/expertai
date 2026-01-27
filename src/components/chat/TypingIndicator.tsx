@@ -85,8 +85,22 @@ export function TypingIndicator() {
                 </svg>
             </div>
 
-            {/* Thinking text */}
-            <span className="text-sm font-medium" style={{ color: '#232323' }}>Thinking...</span>
+            {/* Thinking text with animated dots */}
+            <span className="text-sm font-medium" style={{ color: '#232323' }}>
+                Thinking
+                <motion.span
+                    animate={{ opacity: [0, 1, 1, 0] }}
+                    transition={{ duration: 1.5, times: [0, 0.2, 0.8, 1], repeat: Infinity }}
+                >.</motion.span>
+                <motion.span
+                    animate={{ opacity: [0, 0, 1, 1, 0] }}
+                    transition={{ duration: 1.5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity }}
+                >.</motion.span>
+                <motion.span
+                    animate={{ opacity: [0, 0, 0, 1, 0] }}
+                    transition={{ duration: 1.5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity }}
+                >.</motion.span>
+            </span>
         </motion.div>
     );
 }
