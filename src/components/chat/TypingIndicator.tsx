@@ -86,7 +86,7 @@ export function TypingIndicator() {
             </div>
 
             {/* Thinking text */}
-            <span className="text-gray-500 text-sm font-medium">Thinking...</span>
+            <span className="text-sm font-medium" style={{ color: '#232323' }}>Thinking...</span>
         </motion.div>
     );
 }
