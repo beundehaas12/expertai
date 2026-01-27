@@ -51,7 +51,7 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
                 )}
             </div>
             {/* Show action items for AI messages that are not streaming and have content */}
-            {!isUser && !isStreaming && message.text.trim().length > 0 && <MessageActions messageId={message.id} />}
+            {!isUser && !isStreaming && message.text.trim().length > 0 && <MessageActions messageId={message.id} messageContent={message.text} />}
         </div>
     );
 }
