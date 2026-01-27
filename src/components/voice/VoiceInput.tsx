@@ -439,9 +439,9 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                                     flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full
                                     transition-all duration-200
                                     ${isAiBusy
-                                        ? 'bg-gray-900 text-white cursor-pointer hover:bg-gray-700'
+                                        ? 'bg-gray-900 text-white cursor-pointer'
                                         : hasContent
-                                            ? 'bg-gray-900 text-white cursor-pointer hover:bg-gray-700'
+                                            ? 'bg-gray-900 text-white cursor-pointer'
                                             : 'text-white cursor-not-allowed'
                                     }
                                 `}
