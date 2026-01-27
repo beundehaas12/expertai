@@ -15,6 +15,7 @@ export interface ChatMessage {
     isStreaming?: boolean;
     isCancelled?: boolean;
     isSystemNotice?: boolean;
+    images?: string[]; // URLs of attached images
 }
 
 // Voice input state

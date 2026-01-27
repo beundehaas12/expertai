@@ -132,7 +132,7 @@ export function MessageActions({ messageId, messageContent = '' }: MessageAction
     const buttonClass = "w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors";
 
     return (
-        <div className="flex items-center gap-1 mt-2">
+        <div className="flex items-center gap-1 mt-2 -ml-2">
             <button
                 onClick={handleThumbsUp}
                 className={buttonClass}

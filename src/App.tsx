@@ -187,7 +187,7 @@ export default function App() {
     }, []);
 
     // 1. INPUT HANDLER: Adds to queue
-    const handleSend = useCallback((text: string) => {
+    const handleSend = useCallback((text: string, images?: string[]) => {
         shouldAutoScrollRef.current = true;
         setShowScrollButton(false);
 
@@ -196,6 +196,7 @@ export default function App() {
             text,
             sender: 'user',
             timestamp: Date.now(),
+            images, // Include attached images
         };
 
         // If AI is busy, queue the message (don't add to messages yet)

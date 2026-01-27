@@ -8,7 +8,7 @@ import { IntelligenceEffect } from './IntelligenceEffect';
 import type { VoiceVariant, VoiceInputMode } from '@/types';
 
 interface VoiceInputProps {
-    onSend: (text: string) => void;
+    onSend: (text: string, images?: string[]) => void;
     variant?: VoiceVariant;
     dropdownAbove?: boolean;
     splitView?: boolean;
@@ -311,7 +311,9 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
             : textValue;
 
         if (finalText.trim() || attachedImages.length > 0) {
-            onSend(finalText.trim());
+            // Pass image URLs to onSend
+            const imageUrls = attachedImages.map(img => img.url);
+            onSend(finalText.trim(), imageUrls.length > 0 ? imageUrls : undefined);
             setTextValue('');
             setInterimTranscript('');
             setAttachedImages([]);
