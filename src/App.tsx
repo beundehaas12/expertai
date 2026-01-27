@@ -667,7 +667,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                     Key Features
                                 </h2>
                                 <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
-                                    Our platform offers a seamless experience with voice input capabilities, intelligent context understanding, and multi-modal interactions. The intuitive interface allows you to switch between text and voice effortlessly, making communication natural and efficient.
+                                    Expert AI offers a comprehensive suite of features to enhance your workflow. Use <strong>voice input</strong> with four customizable visualization styles (Waveform, Glow, Moving Glow, and Intelligence). Enable <strong>Deep Thinking mode</strong> for complex queries requiring extended reasoning with a visible chain-of-thought process. <strong>Upload images</strong> directly in chat for visual context and analysis. <strong>Select any text</strong> on this page to instantly discuss it with the AI. Switch between <strong>Chat and Split view</strong> layouts, with a resizable panel and configurable call-to-action button positions. Customize your <strong>Quick Thinking animation</strong> (Spark Morph or Lottie Orbs) in settings. Export conversations as <strong>PDF documents</strong>, and enjoy streaming responses with a clean, modern interface.
                                 </p>
 
                                 {/* Section 3 */}
