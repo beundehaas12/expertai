@@ -59,7 +59,7 @@ export function ExpertButton({ label, onClick, disabled, className = '', isActiv
                     inline-flex items-center justify-center gap-2
                     rounded-full
                     transition-all duration-200
-                    disabled:opacity-50 disabled:cursor-not-allowed
+                    disabled:opacity-50
                     ${hasLabel ? 'px-[10px] h-8' : 'w-8 h-8'}
                     ${isActive ? 'bg-white' : 'bg-black'}
                     ${className}

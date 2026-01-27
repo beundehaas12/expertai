@@ -33,7 +33,7 @@ const activeClasses = {
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     ({ variant = 'default', icon, size = 'md', isActive, className = '', disabled, onClick, ...props }, ref) => {
-        const baseClasses = 'flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed';
+        const baseClasses = 'flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer disabled:opacity-50';
 
         return (
             <motion.button

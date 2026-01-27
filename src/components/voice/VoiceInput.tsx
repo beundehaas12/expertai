@@ -388,7 +388,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                                         flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full
                                         transition-colors duration-200
                                         ${micAvailable === false
-                                            ? 'text-gray-300 cursor-not-allowed'
+                                            ? 'text-gray-300'
                                             : isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant)
                                                 ? 'text-blue-500'
                                                 : 'text-gray-700 hover:bg-gray-100'
@@ -442,7 +442,7 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                                         ? 'bg-gray-900 text-white cursor-pointer'
                                         : hasContent
                                             ? 'bg-gray-900 text-white cursor-pointer'
-                                            : 'text-white cursor-not-allowed'
+                                            : 'text-white'
                                     }
                                 `}
                                 style={!isAiBusy && !hasContent ? { backgroundColor: 'rgba(0, 0, 0, 0.35)' } : undefined}
