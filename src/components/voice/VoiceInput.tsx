@@ -319,6 +319,10 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
             setInterimTranscript('');
             setAttachedImages([]);
             setMode('text');
+            // Reset textarea height to default
+            if (inputRef.current) {
+                inputRef.current.style.height = '40px';
+            }
         }
     }, [mode, interimTranscript, textValue, onSend, attachedImages, deepThinking]);
 
