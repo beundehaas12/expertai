@@ -7,7 +7,7 @@ export interface DropdownItem {
 }
 
 interface DropdownProps {
-    trigger: ReactNode;
+    trigger: ReactNode | ((isOpen: boolean) => ReactNode);
     items: DropdownItem[];
     position?: 'left' | 'center' | 'right';
     direction?: 'up' | 'down';
@@ -65,7 +65,7 @@ export function Dropdown({
     return (
         <div className="relative" ref={dropdownRef}>
             <div onClick={() => setOpen(!isOpen)}>
-                {trigger}
+                {typeof trigger === 'function' ? trigger(isOpen) : trigger}
             </div>
 
             {isOpen && (

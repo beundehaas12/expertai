@@ -152,16 +152,23 @@ export function MessageActions({ messageId, messageContent = '' }: MessageAction
 
             {/* More dropdown using shared Dropdown component */}
             <Dropdown
-                trigger={
+                trigger={(isOpen) => (
                     <motion.button
                         className={buttonClass}
-                        {...motionProps}
+                        whileHover={{ backgroundColor: '#e6f2f9' }}
+                        whileTap={{ backgroundColor: '#F2F8FC' }}
+                        transition={{ duration: 0 }}
+                        style={{ backgroundColor: isOpen ? '#e6f2f9' : undefined }}
                         aria-label="More"
                         title="More"
                     >
-                        <MoreHorizontal size={16} className="text-gray-700" />
+                        <MoreHorizontal
+                            size={16}
+                            strokeWidth={isOpen ? 2 : 1.5}
+                            color={isOpen ? '#005B92' : '#374151'}
+                        />
                     </motion.button>
-                }
+                )}
                 items={[
                     {
                         icon: <Copy size={18} />,
