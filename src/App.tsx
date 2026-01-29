@@ -5,6 +5,7 @@ import { VoiceInput } from '@/components/voice';
 import { ChatMessage, TypingIndicator, PendingIndicator, DeepThinkingBox } from '@/components/chat';
 import { ActionBar, ExpertButton, SideModal, SelectionTooltip } from '@/components/ui';
 import type { ChatMessage as ChatMessageType, VoiceVariant, ButtonPosition } from '@/types';
+import type { BackgroundImage } from '@/components/ui/SideModal';
 import './index.css';
 
 const generalResponses = [
@@ -199,6 +200,11 @@ export default function App() {
         }
         return 'spark';
     });
+    const [backgroundImage, setBackgroundImage] = useState<BackgroundImage>(() => {
+        const saved = localStorage.getItem('expertai-background-image');
+        if (saved) return saved as BackgroundImage;
+        return 'background.jpg';
+    });
 
     // Persist view preference
     useEffect(() => {
@@ -214,6 +220,11 @@ export default function App() {
     useEffect(() => {
         localStorage.setItem('expertai-thinking-animation', thinkingAnimation);
     }, [thinkingAnimation]);
+
+    // Persist background image preference
+    useEffect(() => {
+        localStorage.setItem('expertai-background-image', backgroundImage);
+    }, [backgroundImage]);
 
     // Update button position when switching views (only if position hasn't been manually set)
     const handleViewChange = (isSplit: boolean) => {
@@ -544,12 +555,12 @@ Would you like me to elaborate on any specific aspect of this topic?`;
             document.body.style.backgroundImage = 'none';
             document.body.style.backgroundColor = '#ffffff';
         } else {
-            document.documentElement.style.backgroundImage = "url('./img/background.jpg')";
+            document.documentElement.style.backgroundImage = `url('./img/backgrounds/${backgroundImage}')`;
             document.documentElement.style.backgroundColor = '';
-            document.body.style.backgroundImage = "url('./img/background.jpg')";
+            document.body.style.backgroundImage = `url('./img/backgrounds/${backgroundImage}')`;
             document.body.style.backgroundColor = '';
         }
-    }, [chatStarted]);
+    }, [chatStarted, backgroundImage]);
 
     return (
         <div className="fixed inset-0 flex flex-col">
@@ -627,6 +638,8 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                 isSplitView={splitView}
                 thinkingAnimation={thinkingAnimation}
                 onThinkingAnimationChange={setThinkingAnimation}
+                backgroundImage={backgroundImage}
+                onBackgroundImageChange={setBackgroundImage}
             />
 
             {/* Main Layout */}
@@ -843,7 +856,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             className="flex flex-col relative overflow-hidden"
                             style={{
                                 width: `${splitWidth}%`,
-                                backgroundImage: chatStarted ? 'none' : "url('./img/background.jpg')",
+                                backgroundImage: chatStarted ? 'none' : `url('./img/backgrounds/${backgroundImage}')`,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                             }}

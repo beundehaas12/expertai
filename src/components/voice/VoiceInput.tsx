@@ -562,7 +562,8 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="flex items-center w-full h-full gap-3"
+                            className="flex items-center w-full gap-3"
+                            style={{ height: '40px' }}
                         >
                             {/* Plus Button (disabled) */}
                             <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500">
