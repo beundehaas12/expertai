@@ -439,25 +439,27 @@ export function VoiceInput({ onSend, variant = 'waveform', dropdownAbove = false
                                 {showDropdown && (
                                     <div
                                         ref={dropdownRef}
-                                        className={`absolute left-0 bg-white rounded-lg shadow-lg border border-[#DADADA] overflow-hidden min-w-[180px] z-50 ${dropdownAbove ? 'bottom-full mb-2' : 'top-full mt-2'}`}
+                                        className={`absolute left-0 bg-white rounded-lg shadow-lg border border-[#DADADA] overflow-hidden min-w-[180px] z-50 py-2 ${dropdownAbove ? 'bottom-full mb-2' : 'top-full mt-2'}`}
                                         style={{ borderRadius: '8px' }}
                                     >
                                         <button
-                                            className="w-full px-4 py-3 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                            className="w-full flex items-center hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                            style={{ gap: '8px', paddingLeft: '16px', paddingRight: '16px', height: '32px' }}
                                             onClick={() => {
                                                 setShowDropdown(false);
                                                 fileInputRef.current?.click();
                                             }}
                                         >
-                                            <Image size={18} className="text-gray-500" />
-                                            <span className="text-sm">Upload Image</span>
+                                            <Image size={18} style={{ color: '#323232' }} />
+                                            <span className="text-sm" style={{ color: '#323232' }}>Upload Image</span>
                                         </button>
                                         <button
-                                            className="w-full px-4 py-3 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                            className="w-full flex items-center hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                            style={{ gap: '8px', paddingLeft: '16px', paddingRight: '16px', height: '32px' }}
                                             onClick={() => setShowDropdown(false)}
                                         >
-                                            <FileText size={18} className="text-gray-500" />
-                                            <span className="text-sm">Upload Document</span>
+                                            <FileText size={18} style={{ color: '#323232' }} />
+                                            <span className="text-sm" style={{ color: '#323232' }}>Upload Document</span>
                                         </button>
                                     </div>
                                 )}
