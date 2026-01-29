@@ -660,11 +660,13 @@ Would you like me to elaborate on any specific aspect of this topic?`;
             >
                 {/* Left Side - Logo + Navigation */}
                 <div className="flex items-center gap-6">
-                    <img
-                        src="/img/wk-logo-primary-pos-large.svg"
-                        alt="WK Logo"
-                        className="h-6"
-                    />
+                    <div className="flex items-center">
+                        <img
+                            src="/img/wk-logo-primary-pos-large.svg"
+                            alt="WK Logo"
+                            className="h-6"
+                        />
+                    </div>
                     <nav className="flex items-center gap-1">
                         <button
                             onClick={() => { handleViewChange(false); setComponentsView(false); }}
@@ -1007,20 +1009,19 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                 </div>
                             )}
 
-                            {/* Floating scroll to bottom button */}
-                            {showScrollButton && chatStarted && (
-                                <button
-                                    onClick={scrollToBottomForced}
-                                    className="absolute left-1/2 -translate-x-1/2 bottom-24 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all hover:scale-105"
-                                    aria-label="Scroll to bottom"
-                                >
-                                    <ArrowDown size={20} className="text-gray-600" />
-                                </button>
-                            )}
-
-                            {/* Input Area - fixed at bottom */}
+                            {/* Input Area with scroll button - fixed at bottom */}
                             {chatStarted && (
-                                <div className="flex-shrink-0 flex items-center justify-center px-4 pb-4">
+                                <div className="flex-shrink-0 relative flex flex-col items-center px-4 pb-4">
+                                    {/* Floating scroll to bottom button - positioned above input */}
+                                    {showScrollButton && (
+                                        <button
+                                            onClick={scrollToBottomForced}
+                                            className="absolute -top-14 left-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all hover:scale-105"
+                                            aria-label="Scroll to bottom"
+                                        >
+                                            <ArrowDown size={20} className="text-gray-600" />
+                                        </button>
+                                    )}
                                     <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                                 </div>
                             )}
@@ -1071,20 +1072,19 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                         </div>
                     )}
 
-                    {/* Floating scroll to bottom button */}
-                    {showScrollButton && chatStarted && (
-                        <button
-                            onClick={scrollToBottomForced}
-                            className="absolute left-1/2 -translate-x-1/2 bottom-24 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all hover:scale-105"
-                            aria-label="Scroll to bottom"
-                        >
-                            <ArrowDown size={20} className="text-gray-600" />
-                        </button>
-                    )}
-
-                    {/* Input Area - fixed at bottom */}
+                    {/* Input Area with scroll button - fixed at bottom */}
                     {chatStarted && (
-                        <div className="flex-shrink-0 min-h-[72px] pb-4 flex items-start justify-center px-6">
+                        <div className="flex-shrink-0 relative flex flex-col items-center px-6 pb-4">
+                            {/* Floating scroll to bottom button - positioned above input */}
+                            {showScrollButton && (
+                                <button
+                                    onClick={scrollToBottomForced}
+                                    className="absolute -top-14 left-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all hover:scale-105"
+                                    aria-label="Scroll to bottom"
+                                >
+                                    <ArrowDown size={20} className="text-gray-600" />
+                                </button>
+                            )}
                             <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                         </div>
                     )}

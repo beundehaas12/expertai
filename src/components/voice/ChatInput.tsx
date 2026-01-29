@@ -334,7 +334,7 @@ export function ChatInput({
                             <textarea
                                 ref={textareaRef}
                                 rows={1}
-                                className="flex-1 min-w-0 border-none outline-none text-base text-gray-900 resize-none bg-transparent"
+                                className="flex-1 min-w-0 border-none outline-none text-base text-gray-900 resize-none bg-transparent placeholder:truncate placeholder:whitespace-nowrap placeholder:overflow-hidden placeholder:text-ellipsis"
                                 style={{ height: `${textareaHeight}px`, maxHeight: `${MAX_HEIGHT}px`, lineHeight: '24px', paddingTop: '8px', paddingBottom: '8px' }}
                                 placeholder={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? "Listening..." : "How can Expert AI help?"}
                                 value={displayValue}
