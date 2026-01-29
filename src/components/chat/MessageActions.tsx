@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
 import { ThumbsUp, ThumbsDown, Share2, MoreHorizontal, Copy, Flag, FileDown } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Dropdown } from '../ui/Dropdown';
 
 interface MessageActionsProps {
     messageId: string;
@@ -7,22 +8,6 @@ interface MessageActionsProps {
 }
 
 export function MessageActions({ messageId, messageContent = '' }: MessageActionsProps) {
-    const [moreOpen, setMoreOpen] = useState(false);
-    const moreRef = useRef<HTMLDivElement>(null);
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
-                setMoreOpen(false);
-            }
-        };
-
-        if (moreOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [moreOpen]);
 
     const handleThumbsUp = () => {
         console.log('Thumbs up for message:', messageId);
@@ -41,16 +26,13 @@ export function MessageActions({ messageId, messageContent = '' }: MessageAction
         if (messageContent) {
             navigator.clipboard.writeText(messageContent);
         }
-        setMoreOpen(false);
     };
 
     const handleReport = () => {
         console.log('Report message:', messageId);
-        setMoreOpen(false);
     };
 
     const handleExportPdf = async () => {
-        setMoreOpen(false);
 
         // Dynamic import of jspdf for code splitting
         const { jsPDF } = await import('jspdf');
@@ -128,77 +110,78 @@ export function MessageActions({ messageId, messageContent = '' }: MessageAction
         doc.save(filename);
     };
 
+    // Motion button props for consistent styling
+    const motionProps = {
+        whileHover: { backgroundColor: '#e6f2f9' },
+        whileTap: { backgroundColor: '#F2F8FC' },
+        transition: { duration: 0 }
+    };
+
     // Small variant: 32px button (w-8 h-8), 16px icon
-    const buttonClass = "w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors";
+    const buttonClass = "w-8 h-8 rounded-full bg-white flex items-center justify-center";
 
     return (
         <div className="flex items-center gap-1 mt-2 -ml-2">
-            <button
+            <motion.button
                 onClick={handleThumbsUp}
                 className={buttonClass}
+                {...motionProps}
                 aria-label="Like"
                 title="Like"
             >
                 <ThumbsUp size={16} className="text-gray-700" />
-            </button>
-            <button
+            </motion.button>
+            <motion.button
                 onClick={handleThumbsDown}
                 className={buttonClass}
+                {...motionProps}
                 aria-label="Dislike"
                 title="Dislike"
             >
                 <ThumbsDown size={16} className="text-gray-700" />
-            </button>
-            <button
+            </motion.button>
+            <motion.button
                 onClick={handleShare}
                 className={buttonClass}
+                {...motionProps}
                 aria-label="Share"
                 title="Share"
             >
                 <Share2 size={16} className="text-gray-700" />
-            </button>
+            </motion.button>
 
-            {/* More dropdown - same pattern as ActionBar Expert button dropdown */}
-            <div ref={moreRef} className="relative">
-                <button
-                    onClick={() => setMoreOpen(!moreOpen)}
-                    className={`${buttonClass} ${moreOpen ? 'bg-gray-100' : ''}`}
-                    aria-label="More"
-                    title="More"
-                >
-                    <MoreHorizontal size={16} className="text-gray-700" />
-                </button>
-
-                {/* Dropdown Menu - same style as ActionBar dropdown (line 77-88) */}
-                {moreOpen && (
-                    <div
-                        className="absolute left-0 bottom-full mb-2 bg-white rounded-lg shadow-lg border border-[#DADADA] overflow-hidden min-w-[160px] z-50 py-2"
-                        style={{ borderRadius: '8px' }}
+            {/* More dropdown using shared Dropdown component */}
+            <Dropdown
+                trigger={
+                    <motion.button
+                        className={buttonClass}
+                        {...motionProps}
+                        aria-label="More"
+                        title="More"
                     >
-                        <button
-                            className="w-full px-4 h-8 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
-                            onClick={handleCopy}
-                        >
-                            <Copy size={18} className="text-gray-500" />
-                            <span className="text-sm">Copy to clipboard</span>
-                        </button>
-                        <button
-                            className="w-full px-4 h-8 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
-                            onClick={handleExportPdf}
-                        >
-                            <FileDown size={18} className="text-gray-500" />
-                            <span className="text-sm">Export as PDF</span>
-                        </button>
-                        <button
-                            className="w-full px-4 h-8 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
-                            onClick={handleReport}
-                        >
-                            <Flag size={18} className="text-gray-500" />
-                            <span className="text-sm">Report issue</span>
-                        </button>
-                    </div>
-                )}
-            </div>
+                        <MoreHorizontal size={16} className="text-gray-700" />
+                    </motion.button>
+                }
+                items={[
+                    {
+                        icon: <Copy size={18} />,
+                        label: 'Copy to clipboard',
+                        onClick: handleCopy,
+                    },
+                    {
+                        icon: <FileDown size={18} />,
+                        label: 'Export as PDF',
+                        onClick: handleExportPdf,
+                    },
+                    {
+                        icon: <Flag size={18} />,
+                        label: 'Report issue',
+                        onClick: handleReport,
+                    },
+                ]}
+                position="left"
+                direction="up"
+            />
         </div>
     );
 }

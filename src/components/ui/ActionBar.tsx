@@ -83,13 +83,16 @@ export function ActionBar({ onStartChat, onSummarize, showExpertButton = true }:
                     onMouseEnter={() => setHoveredButton(action)}
                     onMouseLeave={() => setHoveredButton(null)}
                 >
-                    <button
+                    <motion.button
                         onClick={() => handleClick(action)}
-                        className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors"
+                        className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                        whileHover={{ backgroundColor: '#e6f2f9' }}
+                        whileTap={{ backgroundColor: '#F2F8FC' }}
+                        transition={{ duration: 0 }}
                         aria-label={label}
                     >
                         <Icon size={20} className="text-gray-700" />
-                    </button>
+                    </motion.button>
                     <ActionBarTooltip label={label} show={hoveredButton === action} />
                 </div>
             ))}
