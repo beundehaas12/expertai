@@ -1,11 +1,47 @@
 import { useState } from 'react';
-import { X, Copy, Check } from 'lucide-react';
+import { X, Copy, Check, ArrowLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 type VoiceVariant = 'waveform' | 'glow' | 'moving-glow' | 'intelligence';
 type ButtonPosition = 'none' | 'header' | 'actionbar' | 'floating';
 export type ThinkingAnimation = 'spark' | 'lottie';
+export type BackgroundImage =
+    | 'background.jpg'
+    | 'Expert AI - white -  background images 01.jpg'
+    | 'Expert AI - white -  background images 02.jpg'
+    | 'Expert AI - white -  background images 03.jpg'
+    | 'Expert AI - white -  background images 04.jpg'
+    | 'Expert AI - white -  background images 05.jpg'
+    | 'Expert AI - white -  background images 07.jpg'
+    | 'Expert AI - white -  background images 08.jpg'
+    | 'Expert AI - white -  background images 09.jpg'
+    | 'Expert AI - white -  background images 10.jpg'
+    | 'Expert AI - white -  background images 11.jpg'
+    | 'Expert AI - white -  background images 12.jpg'
+    | 'Expert AI - white -  background images 13.jpg'
+    | 'Expert AI - white -  background images 14.jpg'
+    | 'Expert AI - white -  background images 17.jpg'
+    | 'Expert AI - white -  background images 18.jpg';
+
+const BACKGROUND_OPTIONS: { value: BackgroundImage; label: string }[] = [
+    { value: 'background.jpg', label: 'Default' },
+    { value: 'Expert AI - white -  background images 01.jpg', label: 'Style 1' },
+    { value: 'Expert AI - white -  background images 02.jpg', label: 'Style 2' },
+    { value: 'Expert AI - white -  background images 03.jpg', label: 'Style 3' },
+    { value: 'Expert AI - white -  background images 04.jpg', label: 'Style 4' },
+    { value: 'Expert AI - white -  background images 05.jpg', label: 'Style 5' },
+    { value: 'Expert AI - white -  background images 07.jpg', label: 'Style 6' },
+    { value: 'Expert AI - white -  background images 08.jpg', label: 'Style 7' },
+    { value: 'Expert AI - white -  background images 09.jpg', label: 'Style 8' },
+    { value: 'Expert AI - white -  background images 10.jpg', label: 'Style 9' },
+    { value: 'Expert AI - white -  background images 11.jpg', label: 'Style 10' },
+    { value: 'Expert AI - white -  background images 12.jpg', label: 'Style 11' },
+    { value: 'Expert AI - white -  background images 13.jpg', label: 'Style 12' },
+    { value: 'Expert AI - white -  background images 14.jpg', label: 'Style 13' },
+    { value: 'Expert AI - white -  background images 17.jpg', label: 'Style 14' },
+    { value: 'Expert AI - white -  background images 18.jpg', label: 'Style 15' },
+];
 
 interface SideModalProps {
     isOpen: boolean;
@@ -19,6 +55,8 @@ interface SideModalProps {
     isSplitView?: boolean;
     thinkingAnimation?: ThinkingAnimation;
     onThinkingAnimationChange?: (animation: ThinkingAnimation) => void;
+    backgroundImage?: BackgroundImage;
+    onBackgroundImageChange?: (image: BackgroundImage) => void;
 }
 
 const voiceVariants: { value: VoiceVariant; label: string }[] = [
@@ -130,8 +168,11 @@ export function SideModal({
     isSplitView = false,
     thinkingAnimation = 'spark',
     onThinkingAnimationChange,
+    backgroundImage = 'background.jpg',
+    onBackgroundImageChange,
 }: SideModalProps) {
     const [copied, setCopied] = useState(false);
+    const [settingsView, setSettingsView] = useState<'main' | 'background'>('main');
 
     const handleCopyCode = async () => {
         try {
@@ -184,15 +225,81 @@ export function SideModal({
                         <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '1px', backgroundColor: '#DADADA' }} />
 
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', height: '60px', flexShrink: 0 }}>
-                            <h2 style={{ fontSize: '18px', fontWeight: 500, color: '#111827', margin: 0 }}>{title}</h2>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                {settingsView !== 'main' && (
+                                    <button onClick={() => setSettingsView('main')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                                        <ArrowLeft size={20} color="#6b7280" />
+                                    </button>
+                                )}
+                                <h2 style={{ fontSize: '18px', fontWeight: 500, color: '#111827', margin: 0 }}>
+                                    {settingsView === 'background' ? 'Background Image' : title}
+                                </h2>
+                            </div>
                             <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <X size={20} color="#6b7280" />
                             </button>
                         </div>
 
                         <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-                            {children || (
+                            {settingsView === 'background' ? (
+                                <div>
+                                    <p style={{ fontSize: '14px', color: '#6b7280', marginTop: 0, marginBottom: '16px', textAlign: 'left' }}>
+                                        Select a background image for the chat start screen
+                                    </p>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                                        {BACKGROUND_OPTIONS.map(({ value, label }) => (
+                                            <button
+                                                key={value}
+                                                onClick={() => onBackgroundImageChange?.(value)}
+                                                style={{
+                                                    position: 'relative',
+                                                    aspectRatio: '16/10',
+                                                    borderRadius: '8px',
+                                                    overflow: 'hidden',
+                                                    border: backgroundImage === value ? '3px solid #111827' : '2px solid #DADADA',
+                                                    padding: 0,
+                                                    cursor: 'pointer',
+                                                }}
+                                            >
+                                                <img src={`./img/backgrounds/${value}`} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                {backgroundImage === value && (
+                                                    <div style={{ position: 'absolute', bottom: '8px', left: '8px', backgroundColor: '#111827', color: '#fff', fontSize: '11px', fontWeight: 500, padding: '4px 8px', borderRadius: '4px' }}>Selected</div>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : children || (
                                 <>
+                                    <div style={{ marginBottom: '24px' }}>
+                                        <button
+                                            onClick={() => setSettingsView('background')}
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '12px 16px', borderRadius: '8px', border: '1px solid #DADADA', backgroundColor: '#ffffff', cursor: 'pointer' }}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                {/* Thumbnail preview */}
+                                                <div style={{
+                                                    width: '48px',
+                                                    height: '32px',
+                                                    borderRadius: '4px',
+                                                    overflow: 'hidden',
+                                                    border: '1px solid #DADADA',
+                                                    flexShrink: 0,
+                                                }}>
+                                                    <img
+                                                        src={`./img/backgrounds/${backgroundImage}`}
+                                                        alt="Current background"
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                </div>
+                                                <div style={{ textAlign: 'left' }}>
+                                                    <div style={{ fontSize: '14px', fontWeight: 500, color: '#111827' }}>Change Background Image</div>
+                                                    <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>Customize the chat start screen</div>
+                                                </div>
+                                            </div>
+                                            <ChevronRight size={20} color="#6b7280" />
+                                        </button>
+                                    </div>
                                     <div style={{ marginBottom: '24px', opacity: isSplitView ? 1 : 0.5 }}>
                                         <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '8px', marginTop: 0, textAlign: 'left' }}>
                                             Expert AI Call to Action Position
