@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { X, Settings, ArrowDown, Brain } from 'lucide-react';
 import { ChatInput } from '@/components/voice';
 import { ChatMessage, TypingIndicator, PendingIndicator, DeepThinkingBox } from '@/components/chat';
@@ -698,14 +698,21 @@ Would you like me to elaborate on any specific aspect of this topic?`;
 
                 {/* Right Side - Settings + Expert Button */}
                 <div className="flex items-center gap-4">
-                    <button
+                    <motion.button
                         onClick={() => setSettingsOpen(true)}
-                        className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors"
+                        className="w-10 h-10 rounded-full bg-white flex items-center justify-center"
+                        whileHover={{ backgroundColor: '#e6f2f9' }}
+                        whileTap={{ backgroundColor: '#F2F8FC' }}
+                        transition={{ duration: 0 }}
+                        style={{ backgroundColor: settingsOpen ? '#e6f2f9' : undefined }}
                         aria-label="Settings"
                         title="Settings"
                     >
-                        <Settings size={20} className="text-gray-700" />
-                    </button>
+                        <Settings
+                            size={20}
+                            color={settingsOpen ? '#005B92' : '#374151'}
+                        />
+                    </motion.button>
                     {buttonPosition === 'header' && <ExpertButton label="Ask Expert AI" onClick={() => splitView && setChatPanelOpen(true)} />}
                 </div>
             </div>
