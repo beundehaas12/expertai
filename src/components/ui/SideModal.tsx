@@ -5,7 +5,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 type VoiceVariant = 'waveform' | 'glow' | 'moving-glow' | 'intelligence';
 type ButtonPosition = 'none' | 'header' | 'actionbar' | 'floating';
-export type ThinkingAnimation = 'spark' | 'lottie';
+
 export type BackgroundImage =
     | 'background.jpg'
     | 'Expert AI - white -  background images 01.jpg'
@@ -53,8 +53,7 @@ interface SideModalProps {
     buttonPosition?: ButtonPosition;
     onButtonPositionChange?: (position: ButtonPosition) => void;
     isSplitView?: boolean;
-    thinkingAnimation?: ThinkingAnimation;
-    onThinkingAnimationChange?: (animation: ThinkingAnimation) => void;
+
     backgroundImage?: BackgroundImage;
     onBackgroundImageChange?: (image: BackgroundImage) => void;
 }

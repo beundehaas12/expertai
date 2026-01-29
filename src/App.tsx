@@ -193,13 +193,7 @@ export default function App() {
         const viewSaved = localStorage.getItem('expertai-view');
         return viewSaved === 'split' ? 'actionbar' : 'none';
     });
-    const [thinkingAnimation, setThinkingAnimation] = useState<'spark' | 'lottie'>(() => {
-        const saved = localStorage.getItem('expertai-thinking-animation');
-        if (saved === 'spark' || saved === 'lottie') {
-            return saved;
-        }
-        return 'spark';
-    });
+
     const [backgroundImage, setBackgroundImage] = useState<BackgroundImage>(() => {
         const saved = localStorage.getItem('expertai-background-image');
         if (saved) return saved as BackgroundImage;
@@ -216,10 +210,7 @@ export default function App() {
         localStorage.setItem('expertai-button-position', buttonPosition);
     }, [buttonPosition]);
 
-    // Persist thinking animation preference
-    useEffect(() => {
-        localStorage.setItem('expertai-thinking-animation', thinkingAnimation);
-    }, [thinkingAnimation]);
+
 
     // Persist background image preference
     useEffect(() => {
@@ -636,8 +627,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                 buttonPosition={buttonPosition}
                 onButtonPositionChange={setButtonPosition}
                 isSplitView={splitView}
-                thinkingAnimation={thinkingAnimation}
-                onThinkingAnimationChange={setThinkingAnimation}
+
                 backgroundImage={backgroundImage}
                 onBackgroundImageChange={setBackgroundImage}
             />
@@ -680,7 +670,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                     Key Features
                                 </h2>
                                 <p className="text-base mb-6" style={{ color: '#232323', lineHeight: '24px' }}>
-                                    Expert AI offers a comprehensive suite of features to enhance your workflow. Use <strong>voice input</strong> with four customizable visualization styles (Waveform, Glow, Moving Glow, and Intelligence). Enable <strong>Deep Thinking mode</strong> for complex queries requiring extended reasoning with a visible chain-of-thought process. <strong>Upload images</strong> directly in chat for visual context and analysis. <strong>Select any text</strong> on this page to instantly discuss it with the AI. Switch between <strong>Chat and Split view</strong> layouts, with a resizable panel and configurable call-to-action button positions. Customize your <strong>Quick Thinking animation</strong> (Spark Morph or Lottie Orbs) in settings. Export conversations as <strong>PDF documents</strong>, and enjoy streaming responses with a clean, modern interface.
+                                    Expert AI offers a comprehensive suite of features to enhance your workflow. Use <strong>voice input</strong> with four customizable visualization styles (Waveform, Glow, Moving Glow, and Intelligence). Enable <strong>Deep Thinking mode</strong> for complex queries requiring extended reasoning with a visible chain-of-thought process. <strong>Upload images</strong> directly in chat for visual context and analysis. <strong>Select any text</strong> on this page to instantly discuss it with the AI. Switch between <strong>Chat and Split view</strong> layouts, with a resizable panel and configurable call-to-action button positions. Export conversations as <strong>PDF documents</strong>, and enjoy streaming responses with a clean, modern interface.
                                 </p>
 
                                 {/* Section 3 */}
@@ -890,7 +880,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                                     onComplete={handleDeepThinkingComplete}
                                                 />
                                             )}
-                                            {isTyping && !currentDeepThinking && <TypingIndicator variant={thinkingAnimation} />}
+                                            {isTyping && !currentDeepThinking && <TypingIndicator />}
                                             {/* Show Pending Bubble if queue has items and we are busy (Thinking or Streaming) */}
                                             {pendingQueue.length > 0 && (aiStatus === 'thinking' || aiStatus === 'streaming') && (
                                                 <PendingIndicator pendingMessages={pendingQueue.filter(q => q.userMessage).map(q => q.userMessage!)} />
@@ -954,7 +944,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                             onComplete={handleDeepThinkingComplete}
                                         />
                                     )}
-                                    {isTyping && !currentDeepThinking && <TypingIndicator variant={thinkingAnimation} />}
+                                    {isTyping && !currentDeepThinking && <TypingIndicator />}
                                     {/* Show Pending Bubble if queue has items and we are busy (Thinking or Streaming) */}
                                     {pendingQueue.length > 0 && (aiStatus === 'thinking' || aiStatus === 'streaming') && (
                                         <PendingIndicator pendingMessages={pendingQueue.filter(q => q.userMessage).map(q => q.userMessage!)} />
