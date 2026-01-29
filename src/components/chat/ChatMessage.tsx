@@ -56,8 +56,8 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
                     <div className="mb-2">
                         <button
                             onClick={() => setShowThinkingSteps(!showThinkingSteps)}
-                            className="flex items-center gap-1.5 font-sans transition-colors hover:opacity-80"
-                            style={{ fontSize: '14px', lineHeight: '21px', color: '#232323' }}
+                            className="flex items-center font-sans font-normal transition-colors hover:opacity-80"
+                            style={{ fontSize: '14px', lineHeight: '21px', color: '#232323', gap: '10px' }}
                         >
                             <img src="./img/spark-small.svg" alt="" className="w-5 h-5" />
                             <span>Show thinking steps</span>
