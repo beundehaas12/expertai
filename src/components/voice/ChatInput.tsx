@@ -307,7 +307,7 @@ export function ChatInput({
                                     >
                                         <Plus
                                             size={28}
-                                            strokeWidth={plusDropdownOpen ? 2 : 1}
+                                            strokeWidth={plusDropdownOpen ? 2 : 1.5}
                                             color={plusDropdownOpen ? '#005B92' : '#232323'}
                                         />
                                     </motion.button>
@@ -358,7 +358,7 @@ export function ChatInput({
                                 >
                                     <Mic
                                         size={24}
-                                        strokeWidth={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? 2 : 1}
+                                        strokeWidth={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? 2 : 1.5}
                                         color={micAvailable === false ? '#d1d5db' : isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? '#005B92' : '#374151'}
                                     />
                                 </motion.button>
@@ -387,11 +387,11 @@ export function ChatInput({
                         /* Waveform Mode */
                         <motion.div key="waveform" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center w-full gap-3 h-10">
                             <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500">
-                                <Plus size={24} strokeWidth={1} />
+                                <Plus size={24} strokeWidth={1.5} />
                             </div>
                             <Waveform data={visualizerData} />
                             <motion.button className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-gray-700 hover:bg-gray-100" onClick={() => { setInterimTranscript(''); setMode('text'); }} aria-label="Cancel">
-                                <X size={24} strokeWidth={1} />
+                                <X size={24} strokeWidth={1.5} />
                             </motion.button>
                             <motion.button className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-900 text-white" onClick={() => { if (interimTranscript) setText(prev => prev + (prev ? ' ' : '') + interimTranscript.trim()); setInterimTranscript(''); setMode('text'); }} aria-label="Confirm">
                                 <Check size={20} strokeWidth={2} />

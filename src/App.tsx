@@ -1051,7 +1051,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             </div>
                         </div>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center">
+                        <div className="flex-1 flex flex-col items-center justify-center px-6">
                             <img
                                 src="./img/expert-ai-spark.svg"
                                 alt=""
@@ -1077,7 +1077,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
 
                     {/* Input Area - fixed at bottom */}
                     {chatStarted && (
-                        <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-4">
+                        <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-6">
                             <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                         </div>
                     )}
