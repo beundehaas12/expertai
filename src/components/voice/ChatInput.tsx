@@ -299,7 +299,6 @@ export function ChatInput({
                                 trigger={
                                     <motion.button
                                         whileHover={{ backgroundColor: '#e6f2f9' }}
-                                        whileTap={{ scale: 0.95 }}
                                         transition={{ duration: 0 }}
                                         className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full"
                                         style={{ backgroundColor: plusDropdownOpen ? '#e6f2f9' : 'transparent' }}
