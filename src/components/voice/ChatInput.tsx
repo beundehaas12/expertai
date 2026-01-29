@@ -299,6 +299,7 @@ export function ChatInput({
                                 trigger={
                                     <motion.button
                                         whileHover={{ backgroundColor: '#e6f2f9' }}
+                                        whileTap={{ backgroundColor: '#F2F8FC' }}
                                         transition={{ duration: 0 }}
                                         className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full"
                                         style={{ backgroundColor: plusDropdownOpen ? '#e6f2f9' : 'transparent' }}
@@ -344,17 +345,22 @@ export function ChatInput({
                             {/* Mic Button */}
                             <div className="relative" onMouseEnter={() => micAvailable === false && setShowMicTooltip(true)} onMouseLeave={() => setShowMicTooltip(false)}>
                                 <motion.button
-                                    whileHover={micAvailable !== false ? { scale: 1.05 } : {}}
-                                    whileTap={micAvailable !== false ? { scale: 0.95 } : {}}
-                                    className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-colors ${micAvailable === false ? 'text-gray-300' :
-                                        isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? 'text-blue-500' :
-                                            'text-gray-700 hover:bg-gray-100'
-                                        }`}
+                                    whileHover={micAvailable !== false ? { backgroundColor: '#e6f2f9' } : {}}
+                                    whileTap={micAvailable !== false ? { backgroundColor: '#F2F8FC' } : {}}
+                                    transition={{ duration: 0 }}
+                                    className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full"
+                                    style={{
+                                        backgroundColor: isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? '#e6f2f9' : 'transparent'
+                                    }}
                                     onClick={micAvailable !== false ? (isVoiceMode ? () => { if (interimTranscript) setText(prev => prev + (prev ? ' ' : '') + interimTranscript.trim()); setInterimTranscript(''); setMode('text'); } : () => { setText(''); setInterimTranscript(''); setMode('voice'); }) : undefined}
                                     disabled={micAvailable === false}
                                     aria-label={micAvailable === false ? "No microphone" : isVoiceMode ? "Stop" : "Record"}
                                 >
-                                    <Mic size={24} />
+                                    <Mic
+                                        size={24}
+                                        strokeWidth={isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? 2 : 1}
+                                        color={micAvailable === false ? '#d1d5db' : isVoiceMode && (isGlowVariant || isMovingGlowVariant || isIntelligenceVariant) ? '#005B92' : '#374151'}
+                                    />
                                 </motion.button>
 
                                 <AnimatePresence>
@@ -368,8 +374,6 @@ export function ChatInput({
 
                             {/* Send/Stop Button */}
                             <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
                                 className={`flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-colors ${isAiBusy || hasContent ? 'bg-gray-900 text-white' : 'bg-black/35 text-white'
                                     }`}
                                 onClick={isAiBusy ? onStop : handleSend}
@@ -383,13 +387,13 @@ export function ChatInput({
                         /* Waveform Mode */
                         <motion.div key="waveform" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center w-full gap-3 h-10">
                             <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-gray-500">
-                                <Plus size={24} strokeWidth={1.5} />
+                                <Plus size={24} strokeWidth={1} />
                             </div>
                             <Waveform data={visualizerData} />
-                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-gray-700 hover:bg-gray-100" onClick={() => { setInterimTranscript(''); setMode('text'); }} aria-label="Cancel">
-                                <X size={24} strokeWidth={1.5} />
+                            <motion.button className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-gray-700 hover:bg-gray-100" onClick={() => { setInterimTranscript(''); setMode('text'); }} aria-label="Cancel">
+                                <X size={24} strokeWidth={1} />
                             </motion.button>
-                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-900 text-white" onClick={() => { if (interimTranscript) setText(prev => prev + (prev ? ' ' : '') + interimTranscript.trim()); setInterimTranscript(''); setMode('text'); }} aria-label="Confirm">
+                            <motion.button className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-900 text-white" onClick={() => { if (interimTranscript) setText(prev => prev + (prev ? ' ' : '') + interimTranscript.trim()); setInterimTranscript(''); setMode('text'); }} aria-label="Confirm">
                                 <Check size={20} strokeWidth={2} />
                             </motion.button>
                         </motion.div>

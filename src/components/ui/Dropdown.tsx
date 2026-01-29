@@ -89,6 +89,8 @@ export function Dropdown({
                             }}
                             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E6F2F9'}
                             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                            onMouseDown={(e) => e.currentTarget.style.backgroundColor = '#F2F8FC'}
+                            onMouseUp={(e) => e.currentTarget.style.backgroundColor = '#E6F2F9'}
                             onClick={() => {
                                 item.onClick();
                                 setOpen(false);
