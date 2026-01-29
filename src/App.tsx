@@ -663,7 +663,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                     <img
                         src="./img/wk-logo-primary-pos-large.svg"
                         alt="WK Logo"
-                        className="h-5"
+                        className="h-6"
                     />
                     <nav className="flex items-center gap-1">
                         <button
