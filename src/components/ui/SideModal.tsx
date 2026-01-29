@@ -287,7 +287,7 @@ export function SideModal({
                                                     flexShrink: 0,
                                                 }}>
                                                     <img
-                                                        src={`./img/backgrounds/${backgroundImage}`}
+                                                        src={`/img/backgrounds/${backgroundImage}`}
                                                         alt="Current background"
                                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                     />
