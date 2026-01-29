@@ -44,6 +44,7 @@ export function ChatInput({
     const [text, setText] = useState('');
     const [textareaHeight, setTextareaHeight] = useState(MIN_HEIGHT);
     const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([]);
+    const [plusDropdownOpen, setPlusDropdownOpen] = useState(false);
 
     // Voice state
     const [interimTranscript, setInterimTranscript] = useState('');
@@ -297,12 +298,18 @@ export function ChatInput({
                             <Dropdown
                                 trigger={
                                     <motion.button
-                                        whileHover={{ scale: 1.05 }}
+                                        whileHover={{ backgroundColor: '#e6f2f9' }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-[#232323]"
+                                        transition={{ duration: 0 }}
+                                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full"
+                                        style={{ backgroundColor: plusDropdownOpen ? '#e6f2f9' : 'transparent' }}
                                         aria-label="Add attachment"
                                     >
-                                        <Plus size={28} strokeWidth={1} />
+                                        <Plus
+                                            size={28}
+                                            strokeWidth={plusDropdownOpen ? 2 : 1}
+                                            color={plusDropdownOpen ? '#005B92' : '#232323'}
+                                        />
                                     </motion.button>
                                 }
                                 items={[
@@ -319,6 +326,8 @@ export function ChatInput({
                                 ]}
                                 position="left"
                                 direction={dropdownAbove ? 'up' : 'down'}
+                                isOpen={plusDropdownOpen}
+                                onOpenChange={setPlusDropdownOpen}
                             />
 
                             {/* Textarea */}
