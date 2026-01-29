@@ -53,7 +53,8 @@ interface SideModalProps {
     buttonPosition?: ButtonPosition;
     onButtonPositionChange?: (position: ButtonPosition) => void;
     isSplitView?: boolean;
-
+    deepThinking?: boolean;
+    onDeepThinkingChange?: (enabled: boolean) => void;
     backgroundImage?: BackgroundImage;
     onBackgroundImageChange?: (image: BackgroundImage) => void;
 }
@@ -83,6 +84,8 @@ export function SideModal({
     buttonPosition = 'header',
     onButtonPositionChange,
     isSplitView = false,
+    deepThinking = false,
+    onDeepThinkingChange,
     backgroundImage = 'background.jpg',
     onBackgroundImageChange,
 }: SideModalProps) {
@@ -342,6 +345,63 @@ export function SideModal({
                                             <span style={{ fontSize: '14px', fontWeight: 500, color: '#111827' }}>
                                                 Lottie Orbs
                                             </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Deep Thinking Toggle */}
+                                    <div style={{ marginBottom: '24px' }}>
+                                        <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#374151', marginBottom: '12px', marginTop: 0, textAlign: 'left' }}>
+                                            Deep Thinking Mode
+                                        </h3>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                padding: '12px 16px',
+                                                borderRadius: '8px',
+                                                border: '1px solid #DADADA',
+                                                backgroundColor: '#ffffff',
+                                            }}
+                                        >
+                                            <div>
+                                                <span style={{ fontSize: '14px', fontWeight: 500, color: '#111827' }}>
+                                                    Enable Deep Thinking
+                                                </span>
+                                                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginBottom: 0 }}>
+                                                    Extended reasoning with visible chain-of-thought
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => onDeepThinkingChange?.(!deepThinking)}
+                                                style={{
+                                                    position: 'relative',
+                                                    width: '44px',
+                                                    height: '24px',
+                                                    borderRadius: '12px',
+                                                    backgroundColor: deepThinking ? '#111827' : '#d1d5db',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    transition: 'background-color 0.2s',
+                                                    flexShrink: 0,
+                                                }}
+                                                role="switch"
+                                                aria-checked={deepThinking}
+                                            >
+                                                <span
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '4px',
+                                                        left: deepThinking ? '24px' : '4px',
+                                                        width: '16px',
+                                                        height: '16px',
+                                                        borderRadius: '50%',
+                                                        backgroundColor: 'white',
+                                                        boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                                                        transition: 'left 0.2s',
+                                                    }}
+                                                />
+                                            </button>
                                         </div>
                                     </div>
                                 </>

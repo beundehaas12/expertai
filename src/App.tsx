@@ -677,26 +677,8 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                     </button>
                 </nav>
 
-                {/* Right Side - Deep Thinking Toggle + Settings + Expert Button */}
+                {/* Right Side - Settings + Expert Button */}
                 <div className="flex items-center gap-4">
-                    {/* Deep Thinking Toggle */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Deep Thinking</span>
-                        <button
-                            onClick={() => setDeepThinking(!deepThinking)}
-                            className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${deepThinking ? 'bg-black' : 'bg-gray-300'
-                                }`}
-                            title={deepThinking ? 'Deep Thinking is On' : 'Deep Thinking is Off'}
-                            role="switch"
-                            aria-checked={deepThinking}
-                        >
-                            <span
-                                className={`absolute inset-y-0 my-auto w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${deepThinking ? 'left-6' : 'left-1'
-                                    }`}
-                            />
-                        </button>
-                    </div>
-
                     <button
                         onClick={() => setSettingsOpen(true)}
                         className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors"
@@ -719,7 +701,8 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                 buttonPosition={buttonPosition}
                 onButtonPositionChange={setButtonPosition}
                 isSplitView={splitView}
-
+                deepThinking={deepThinking}
+                onDeepThinkingChange={setDeepThinking}
                 backgroundImage={backgroundImage}
                 onBackgroundImageChange={setBackgroundImage}
             />

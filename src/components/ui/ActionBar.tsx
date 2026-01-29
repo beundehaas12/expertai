@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, FileText, Bookmark, Share2, Settings, MessageCircle, FileSearch } from 'lucide-react';
+import { FolderOpen, FileText, Bookmark, Share2, Settings, MessageCircle, FileSearch } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExpertButton } from './ExpertButton';
 
@@ -11,7 +11,7 @@ interface ActionBarProps {
 }
 
 const actionButtons = [
-    { icon: Plus, label: 'New Chat', action: 'new' },
+    { icon: FolderOpen, label: 'Files', action: 'files' },
     { icon: FileText, label: 'Documents', action: 'documents' },
     { icon: Bookmark, label: 'Saved Items', action: 'saved' },
     { icon: Share2, label: 'Share', action: 'share' },
@@ -74,11 +74,8 @@ export function ActionBar({ onNewChat, onStartChat, onSummarize, showExpertButto
         };
     }, [showDropdown]);
 
-    const handleClick = (action: string) => {
-        if (action === 'new' && onNewChat) {
-            onNewChat();
-        }
-        // Other actions can be implemented later
+    const handleClick = (_action: string) => {
+        // Dummy handlers - no functionality implemented
     };
 
     const handleStartChat = () => {
