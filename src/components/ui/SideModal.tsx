@@ -364,11 +364,11 @@ export function SideModal({
                                                 backgroundColor: '#ffffff',
                                             }}
                                         >
-                                            <div>
+                                            <div style={{ textAlign: 'left' }}>
                                                 <span style={{ fontSize: '14px', fontWeight: 500, color: '#111827' }}>
                                                     Enable Deep Thinking
                                                 </span>
-                                                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginBottom: 0 }}>
+                                                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginBottom: 0, textAlign: 'left' }}>
                                                     Extended reasoning with visible chain-of-thought
                                                 </p>
                                             </div>

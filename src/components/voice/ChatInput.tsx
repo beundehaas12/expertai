@@ -5,6 +5,7 @@ import { Waveform } from './Waveform';
 import { GlowEffect } from './GlowEffect';
 import { MovingGlowEffect } from './MovingGlowEffect';
 import { IntelligenceEffect } from './IntelligenceEffect';
+import { Dropdown } from '@/components/ui/Dropdown';
 import type { VoiceVariant, VoiceInputMode } from '@/types';
 
 // Constants
@@ -42,7 +43,6 @@ export function ChatInput({
     const [mode, setMode] = useState<VoiceInputMode>('text');
     const [text, setText] = useState('');
     const [textareaHeight, setTextareaHeight] = useState(MIN_HEIGHT);
-    const [showDropdown, setShowDropdown] = useState(false);
     const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([]);
 
     // Voice state
@@ -54,7 +54,6 @@ export function ChatInput({
 
     // Refs
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const dropdownRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
@@ -98,20 +97,6 @@ export function ChatInput({
             textareaRef.current.focus();
         }
     }, [mode]);
-
-    // Close dropdown on outside click
-    useEffect(() => {
-        if (!showDropdown) return;
-
-        const handleClick = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setShowDropdown(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
-    }, [showDropdown]);
 
     // Report voice state to parent
     useEffect(() => {
@@ -308,38 +293,33 @@ export function ChatInput({
                 <AnimatePresence mode="wait">
                     {showInputMode ? (
                         <motion.div key="input" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-end w-full gap-3">
-                            {/* Plus Button */}
-                            <div className="relative">
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-[#232323]"
-                                    onClick={() => setShowDropdown(!showDropdown)}
-                                    aria-label="Add attachment"
-                                >
-                                    <Plus size={28} strokeWidth={1} />
-                                </motion.button>
-
-                                {showDropdown && (
-                                    <div
-                                        ref={dropdownRef}
-                                        className={`absolute left-0 bg-white rounded-lg shadow-lg border border-[#DADADA] min-w-[180px] z-50 py-2 ${dropdownAbove ? 'bottom-full mb-2' : 'top-full mt-2'}`}
+                            {/* Plus Button with Dropdown */}
+                            <Dropdown
+                                trigger={
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-[#232323]"
+                                        aria-label="Add attachment"
                                     >
-                                        <button
-                                            className="w-full flex items-center gap-2 px-4 h-8 hover:bg-gray-50 text-sm text-[#323232]"
-                                            onClick={() => { setShowDropdown(false); fileInputRef.current?.click(); }}
-                                        >
-                                            <Image size={18} /> Upload Image
-                                        </button>
-                                        <button
-                                            className="w-full flex items-center gap-2 px-4 h-8 hover:bg-gray-50 text-sm text-[#323232]"
-                                            onClick={() => setShowDropdown(false)}
-                                        >
-                                            <FileText size={18} /> Upload Document
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                                        <Plus size={28} strokeWidth={1} />
+                                    </motion.button>
+                                }
+                                items={[
+                                    {
+                                        icon: <Image size={18} />,
+                                        label: 'Upload Image',
+                                        onClick: () => fileInputRef.current?.click(),
+                                    },
+                                    {
+                                        icon: <FileText size={18} />,
+                                        label: 'Upload Document',
+                                        onClick: () => { },
+                                    },
+                                ]}
+                                position="left"
+                                direction={dropdownAbove ? 'up' : 'down'}
+                            />
 
                             {/* Textarea */}
                             <textarea

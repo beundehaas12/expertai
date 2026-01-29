@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { FolderOpen, FileText, Bookmark, Share2, Settings, MessageCircle, FileSearch } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExpertButton } from './ExpertButton';
+import { Dropdown } from './Dropdown';
 
 interface ActionBarProps {
     onNewChat?: () => void;
@@ -51,46 +52,27 @@ function ActionBarTooltip({ label, show }: { label: string; show: boolean }) {
     );
 }
 
-export function ActionBar({ onNewChat, onStartChat, onSummarize, showExpertButton = true }: ActionBarProps) {
-    const [showDropdown, setShowDropdown] = useState(false);
+export function ActionBar({ onStartChat, onSummarize, showExpertButton = true }: ActionBarProps) {
     const [hoveredButton, setHoveredButton] = useState<string | null>(null);
     const [showExpertTooltip, setShowExpertTooltip] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setShowDropdown(false);
-            }
-        };
-
-        if (showDropdown) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [showDropdown]);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const handleClick = (_action: string) => {
         // Dummy handlers - no functionality implemented
     };
 
-    const handleStartChat = () => {
-        setShowDropdown(false);
-        if (onStartChat) {
-            onStartChat();
-        }
-    };
-
-    const handleSummarize = () => {
-        setShowDropdown(false);
-        if (onSummarize) {
-            onSummarize();
-        }
-    };
+    const dropdownItems = [
+        {
+            icon: <MessageCircle size={18} />,
+            label: 'Start a chat',
+            onClick: () => onStartChat?.(),
+        },
+        {
+            icon: <FileSearch size={18} />,
+            label: 'Summarize document',
+            onClick: () => onSummarize?.(),
+        },
+    ];
 
     return (
         <div className="flex flex-col items-center gap-2">
@@ -116,39 +98,20 @@ export function ActionBar({ onNewChat, onStartChat, onSummarize, showExpertButto
             {showExpertButton && (
                 <div
                     className="relative"
-                    ref={dropdownRef}
-                    onMouseEnter={() => !showDropdown && setShowExpertTooltip(true)}
+                    onMouseEnter={() => !dropdownOpen && setShowExpertTooltip(true)}
                     onMouseLeave={() => setShowExpertTooltip(false)}
                 >
-                    <div onClick={() => { setShowDropdown(!showDropdown); setShowExpertTooltip(false); }}>
-                        <ExpertButton isActive={showDropdown} />
-                    </div>
-                    <ActionBarTooltip label="Ask Expert AI" show={showExpertTooltip && !showDropdown} />
-
-                    {/* Dropdown Menu */}
-                    {showDropdown && (
-                        <div
-                            className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border border-[#DADADA] overflow-hidden min-w-[180px] z-50 py-2"
-                            style={{ borderRadius: '8px' }}
-                        >
-                            <button
-                                className="w-full flex items-center hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
-                                style={{ gap: '8px', paddingLeft: '16px', paddingRight: '16px', height: '32px' }}
-                                onClick={handleStartChat}
-                            >
-                                <MessageCircle size={18} style={{ color: '#323232' }} />
-                                <span className="text-sm" style={{ color: '#323232' }}>Start a chat</span>
-                            </button>
-                            <button
-                                className="w-full flex items-center hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
-                                style={{ gap: '8px', paddingLeft: '16px', paddingRight: '16px', height: '32px' }}
-                                onClick={handleSummarize}
-                            >
-                                <FileSearch size={18} style={{ color: '#323232' }} />
-                                <span className="text-sm" style={{ color: '#323232' }}>Summarize document</span>
-                            </button>
-                        </div>
-                    )}
+                    <Dropdown
+                        trigger={<ExpertButton isActive={dropdownOpen} />}
+                        items={dropdownItems}
+                        position="right"
+                        isOpen={dropdownOpen}
+                        onOpenChange={(open) => {
+                            setDropdownOpen(open);
+                            if (open) setShowExpertTooltip(false);
+                        }}
+                    />
+                    <ActionBarTooltip label="Ask Expert AI" show={showExpertTooltip && !dropdownOpen} />
                 </div>
             )}
         </div>
