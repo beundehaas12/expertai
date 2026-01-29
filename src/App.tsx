@@ -1014,13 +1014,16 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                 <div className="flex-shrink-0 relative flex flex-col items-center px-4 pb-4">
                                     {/* Floating scroll to bottom button - positioned above input */}
                                     {showScrollButton && (
-                                        <button
+                                        <motion.button
                                             onClick={scrollToBottomForced}
-                                            className="absolute -top-14 left-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all hover:scale-105"
+                                            className="absolute -top-14 left-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center group"
+                                            whileHover={{ backgroundColor: '#003D61' }}
+                                            whileTap={{ backgroundColor: '#005B92' }}
+                                            transition={{ duration: 0 }}
                                             aria-label="Scroll to bottom"
                                         >
-                                            <ArrowDown size={20} className="text-gray-600" />
-                                        </button>
+                                            <ArrowDown size={20} className="text-gray-600 group-hover:text-white" />
+                                        </motion.button>
                                     )}
                                     <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                                 </div>
@@ -1077,13 +1080,16 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                         <div className="flex-shrink-0 relative flex flex-col items-center px-6 pb-4">
                             {/* Floating scroll to bottom button - positioned above input */}
                             {showScrollButton && (
-                                <button
+                                <motion.button
                                     onClick={scrollToBottomForced}
-                                    className="absolute -top-14 left-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all hover:scale-105"
+                                    className="absolute -top-14 left-1/2 -translate-x-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center group"
+                                    whileHover={{ backgroundColor: '#003D61' }}
+                                    whileTap={{ backgroundColor: '#005B92' }}
+                                    transition={{ duration: 0 }}
                                     aria-label="Scroll to bottom"
                                 >
-                                    <ArrowDown size={20} className="text-gray-600" />
-                                </button>
+                                    <ArrowDown size={20} className="text-gray-600 group-hover:text-white" />
+                                </motion.button>
                             )}
                             <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                         </div>
