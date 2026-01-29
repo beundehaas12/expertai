@@ -343,7 +343,7 @@ export function SideModal({
                                                 />
                                             </div>
                                             <span style={{ fontSize: '14px', fontWeight: 500, color: '#111827' }}>
-                                                Lottie Orbs
+                                                Thinking...
                                             </span>
                                         </div>
                                     </div>
