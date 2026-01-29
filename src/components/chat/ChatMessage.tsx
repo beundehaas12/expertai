@@ -59,7 +59,7 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
                             className="flex items-center gap-1.5 font-sans transition-colors hover:opacity-80"
                             style={{ fontSize: '14px', lineHeight: '21px', color: '#232323' }}
                         >
-                            <img src="./img/expert-ai-spark.svg" alt="" className="w-4 h-4" />
+                            <img src="./img/spark-small.svg" alt="" className="w-5 h-5" />
                             <span>Show thinking steps</span>
                             <motion.span
                                 animate={{ rotate: showThinkingSteps ? 180 : 0 }}
