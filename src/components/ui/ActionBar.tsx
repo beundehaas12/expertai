@@ -6,6 +6,7 @@ import { ExpertButton } from './ExpertButton';
 interface ActionBarProps {
     onNewChat?: () => void;
     onStartChat?: () => void;
+    onSummarize?: () => void;
     showExpertButton?: boolean;
 }
 
@@ -50,7 +51,7 @@ function ActionBarTooltip({ label, show }: { label: string; show: boolean }) {
     );
 }
 
-export function ActionBar({ onNewChat, onStartChat, showExpertButton = true }: ActionBarProps) {
+export function ActionBar({ onNewChat, onStartChat, onSummarize, showExpertButton = true }: ActionBarProps) {
     const [showDropdown, setShowDropdown] = useState(false);
     const [hoveredButton, setHoveredButton] = useState<string | null>(null);
     const [showExpertTooltip, setShowExpertTooltip] = useState(false);
@@ -89,7 +90,9 @@ export function ActionBar({ onNewChat, onStartChat, showExpertButton = true }: A
 
     const handleSummarize = () => {
         setShowDropdown(false);
-        // Summarize document action - can be implemented later
+        if (onSummarize) {
+            onSummarize();
+        }
     };
 
     return (
