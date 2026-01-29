@@ -661,7 +661,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                 {/* Left Side - Logo + Navigation */}
                 <div className="flex items-center gap-6">
                     <img
-                        src="./img/wk-logo-primary-pos-large.svg"
+                        src="/img/wk-logo-primary-pos-large.svg"
                         alt="WK Logo"
                         className="h-6"
                     />
