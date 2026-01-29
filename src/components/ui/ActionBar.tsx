@@ -135,18 +135,20 @@ export function ActionBar({ onNewChat, onStartChat, onSummarize, showExpertButto
                             style={{ borderRadius: '8px' }}
                         >
                             <button
-                                className="w-full px-4 h-8 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                className="w-full flex items-center hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                style={{ gap: '8px', paddingLeft: '16px', paddingRight: '16px', height: '32px' }}
                                 onClick={handleStartChat}
                             >
-                                <MessageCircle size={18} className="text-gray-500" />
-                                <span className="text-sm">Start a chat</span>
+                                <MessageCircle size={18} style={{ color: '#323232' }} />
+                                <span className="text-sm" style={{ color: '#323232' }}>Start a chat</span>
                             </button>
                             <button
-                                className="w-full px-4 h-8 flex items-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                className="w-full flex items-center hover:bg-gray-50 transition-colors text-left whitespace-nowrap"
+                                style={{ gap: '8px', paddingLeft: '16px', paddingRight: '16px', height: '32px' }}
                                 onClick={handleSummarize}
                             >
-                                <FileSearch size={18} className="text-gray-500" />
-                                <span className="text-sm">Summarize document</span>
+                                <FileSearch size={18} style={{ color: '#323232' }} />
+                                <span className="text-sm" style={{ color: '#323232' }}>Summarize document</span>
                             </button>
                         </div>
                     )}
