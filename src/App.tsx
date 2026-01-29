@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { X, Settings, ArrowDown, Brain } from 'lucide-react';
-import { VoiceInput } from '@/components/voice';
+import { ChatInput } from '@/components/voice';
 import { ChatMessage, TypingIndicator, PendingIndicator, DeepThinkingBox } from '@/components/chat';
 import { ActionBar, ExpertButton, SideModal, SelectionTooltip } from '@/components/ui';
+import { ComponentsPage } from '@/components/pages/ComponentsPage';
 import type { ChatMessage as ChatMessageType, VoiceVariant, ButtonPosition } from '@/types';
 import type { BackgroundImage } from '@/components/ui/SideModal';
 import './index.css';
@@ -175,6 +176,7 @@ export default function App() {
     const [currentDeepThinking, setCurrentDeepThinking] = useState(false);
 
     const [voiceVariant, setVoiceVariant] = useState<VoiceVariant>('glow');
+    const [componentsView, setComponentsView] = useState(false);
     const [splitView, setSplitView] = useState(() => {
         const saved = localStorage.getItem('expertai-view');
         return saved === 'split';
@@ -408,6 +410,7 @@ export default function App() {
         setChatStarted(false);
         setPendingQueue([]); // Clear queue
         setAiStatus('idle'); // Reset status
+        setChatPanelOpen(true); // Open chat panel
     }, []);
 
     // Handle "Summarize document" action from ActionBar
@@ -658,8 +661,8 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                 {/* Left Side - Navigation */}
                 <nav className="flex items-center gap-1">
                     <button
-                        onClick={() => handleViewChange(false)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${!splitView
+                        onClick={() => { handleViewChange(false); setComponentsView(false); }}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${!splitView && !componentsView
                             ? 'bg-gray-100 text-gray-900'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                             }`}
@@ -667,13 +670,22 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                         Chat
                     </button>
                     <button
-                        onClick={() => handleViewChange(true)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${splitView
+                        onClick={() => { handleViewChange(true); setComponentsView(false); }}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${splitView && !componentsView
                             ? 'bg-gray-100 text-gray-900'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                             }`}
                     >
                         Split
+                    </button>
+                    <button
+                        onClick={() => setComponentsView(true)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${componentsView
+                            ? 'bg-gray-100 text-gray-900'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                            }`}
+                    >
+                        Expert AI Components
                     </button>
                 </nav>
 
@@ -708,7 +720,10 @@ Would you like me to elaborate on any specific aspect of this topic?`;
             />
 
             {/* Main Layout */}
-            {splitView ? (
+            {componentsView ? (
+                /* Components View */
+                <ComponentsPage />
+            ) : splitView ? (
                 /* Split View Mode */
                 <div className={`flex-1 flex bg-white ${chatPanelOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
                     {/* Left Panel - Content Area */}
@@ -974,7 +989,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                                     <h1 className="text-3xl font-medium text-gray-900 text-center mb-10">
                                         How can I help you?
                                     </h1>
-                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
+                                    <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                                 </div>
                             )}
 
@@ -992,7 +1007,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             {/* Input Area - fixed at bottom */}
                             {chatStarted && (
                                 <div className="flex-shrink-0 flex items-center justify-center px-4 pb-4">
-                                    <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
+                                    <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                                 </div>
                             )}
                         </div>
@@ -1038,7 +1053,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                             <h1 className="text-3xl font-medium text-gray-900 text-center mb-10">
                                 How can I help you?
                             </h1>
-                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
+                            <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={false} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                         </div>
                     )}
 
@@ -1056,7 +1071,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                     {/* Input Area - fixed at bottom */}
                     {chatStarted && (
                         <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-4">
-                            <VoiceInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
+                            <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                         </div>
                     )}
                 </div>
