@@ -658,36 +658,43 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                     borderBottom: '1px solid #DADADA'
                 }}
             >
-                {/* Left Side - Navigation */}
-                <nav className="flex items-center gap-1">
-                    <button
-                        onClick={() => { handleViewChange(false); setComponentsView(false); }}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${!splitView && !componentsView
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
-                    >
-                        Chat
-                    </button>
-                    <button
-                        onClick={() => { handleViewChange(true); setComponentsView(false); }}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${splitView && !componentsView
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
-                    >
-                        Split
-                    </button>
-                    <button
-                        onClick={() => setComponentsView(true)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${componentsView
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                            }`}
-                    >
-                        Expert AI Components
-                    </button>
-                </nav>
+                {/* Left Side - Logo + Navigation */}
+                <div className="flex items-center gap-6">
+                    <img
+                        src="./img/wk-logo-primary-pos-large.svg"
+                        alt="WK Logo"
+                        className="h-5"
+                    />
+                    <nav className="flex items-center gap-1">
+                        <button
+                            onClick={() => { handleViewChange(false); setComponentsView(false); }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${!splitView && !componentsView
+                                ? 'bg-gray-100 text-gray-900'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                }`}
+                        >
+                            Chat
+                        </button>
+                        <button
+                            onClick={() => { handleViewChange(true); setComponentsView(false); }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${splitView && !componentsView
+                                ? 'bg-gray-100 text-gray-900'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                }`}
+                        >
+                            Split
+                        </button>
+                        <button
+                            onClick={() => setComponentsView(true)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${componentsView
+                                ? 'bg-gray-100 text-gray-900'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                }`}
+                        >
+                            Expert AI Components
+                        </button>
+                    </nav>
+                </div>
 
                 {/* Right Side - Settings + Expert Button */}
                 <div className="flex items-center gap-4">

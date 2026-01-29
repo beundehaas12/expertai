@@ -4,7 +4,7 @@ import type { ChatMessage as ChatMessageType } from '@/types';
 import { MessageActions } from './MessageActions';
 import { StreamingText } from './StreamingText';
 import { FormattedText } from './FormattedText';
-import { X, ChevronLeft, ChevronRight, ChevronDown, Brain, CheckCircle2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface ChatMessageProps {
     message: ChatMessageType;
@@ -77,13 +77,21 @@ export function ChatMessage({ message, onStreamComplete, onStreamUpdate }: ChatM
                                     transition={{ duration: 0.2 }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
-                                        {message.thinkingSteps!.map((step, index) => (
-                                            <div key={index} className="flex items-start gap-2 text-xs text-slate-600">
-                                                <CheckCircle2 size={12} className="text-emerald-500 mt-0.5 flex-shrink-0" />
-                                                <span>{step}</span>
-                                            </div>
-                                        ))}
+                                    <div className="mt-2 p-4 rounded-[16px]" style={{ backgroundColor: '#F6F6F6', border: '1px solid #DADADA' }}>
+                                        <ul className="space-y-2 m-0 pl-5" style={{ listStyleType: 'disc' }}>
+                                            {message.thinkingSteps!.map((step, index) => {
+                                                // Clean up the step text: remove "..." and format better
+                                                const cleanStep = step
+                                                    .replace(/\.\.\.\s*/g, ': ')
+                                                    .replace(/:\s*:/, ':')
+                                                    .trim();
+                                                return (
+                                                    <li key={index} className="text-left" style={{ fontSize: '16px', color: '#232323', lineHeight: '1.6' }}>
+                                                        {cleanStep}
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
                                     </div>
                                 </motion.div>
                             )}
