@@ -80,13 +80,15 @@ export function Dropdown({
                     {items.map((item, index) => (
                         <button
                             key={index}
-                            className="w-full flex items-center hover:bg-gray-50 transition-colors text-left"
+                            className="w-full flex items-center text-left"
                             style={{
                                 gap: '8px',
                                 paddingLeft: '16px',
                                 paddingRight: '16px',
                                 height: '32px'
                             }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E6F2F9'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                             onClick={() => {
                                 item.onClick();
                                 setOpen(false);
