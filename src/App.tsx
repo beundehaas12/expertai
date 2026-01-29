@@ -1077,7 +1077,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
 
                     {/* Input Area - fixed at bottom */}
                     {chatStarted && (
-                        <div className="flex-shrink-0 h-[72px] flex items-start justify-center px-6">
+                        <div className="flex-shrink-0 min-h-[72px] pb-4 flex items-start justify-center px-6">
                             <ChatInput onSend={handleSend} variant={voiceVariant} dropdownAbove={true} isAiBusy={isAiBusy} onStop={handleStopGeneration} deepThinking={deepThinking} />
                         </div>
                     )}
