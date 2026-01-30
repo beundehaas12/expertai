@@ -686,6 +686,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                         >
                             Split
                         </button>
+                        {/* Hidden for now
                         <button
                             onClick={() => setComponentsView(true)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${componentsView
@@ -695,6 +696,7 @@ Would you like me to elaborate on any specific aspect of this topic?`;
                         >
                             Expert AI Components
                         </button>
+                        */}
                     </nav>
                 </div>
 
