@@ -336,7 +336,7 @@ export function SideModal({
                                             {/* Lottie Preview */}
                                             <div style={{ width: 32, height: 32, flexShrink: 0 }}>
                                                 <DotLottieReact
-                                                    src="https://lottie.host/ffa64a10-bdb4-428d-a857-506dd9c99743/PeznJG0pDA.lottie"
+                                                    src="https://lottie.host/8d36566e-b09d-4b9d-9428-65dbc07b3a57/t0GL6PpqqT.lottie"
                                                     loop
                                                     autoplay
                                                     style={{ width: 32, height: 32 }}
