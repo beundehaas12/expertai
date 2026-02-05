@@ -69,7 +69,7 @@ export function ExpertButton({ label, onClick, disabled, className = '', isActiv
                 }}
             >
                 <img
-                    src="/img/expert-ai-spark-button.svg"
+                    src="./img/expert-ai-spark-button.svg"
                     alt=""
                     className={`
                         ${hasLabel ? 'w-4 h-4' : 'w-5 h-5'} 

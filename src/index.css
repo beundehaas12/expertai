@@ -85,7 +85,7 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  background-image: url('/img/background.jpg');
+  background-image: url('/expertai/img/background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

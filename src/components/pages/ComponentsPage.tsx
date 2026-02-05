@@ -75,7 +75,7 @@ export function ExpertButton({ label, onClick, disabled, className = '', isActiv
                 }}
             >
                 <img
-                    src="/img/expert-ai-spark-button.svg"
+                    src="./img/expert-ai-spark-button.svg"
                     alt=""
                     className={\`
                         \${hasLabel ? 'w-4 h-4' : 'w-5 h-5'} 
@@ -312,7 +312,7 @@ export function ComponentsPage() {
                             <div>
                                 <p className="text-sm text-gray-600 mb-2">3. Add icon to public folder:</p>
                                 <code className="text-sm bg-gray-100 px-2 py-1 rounded">
-                                    /public/img/expert-ai-spark-button.svg
+                                    public/img/expert-ai-spark-button.svg
                                 </code>
                             </div>
                         </div>
